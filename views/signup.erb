@@ -1,0 +1,31 @@
+<div id="frame" style="height: 300">
+
+  <h1> 
+      <%= @page_heading %> 
+  </h1>
+  
+  <br>
+  <div>
+  
+  <form id="login" action="/signedup" method="POST" style="overflow-y:auto;">
+            
+      <div class="span1 offset1">
+          <input style="height: 28px; margin-bottom: 1px" type="text" width="100" name="firstname" placeholder="first name" onblur="javascript:checkFirstName(this)" />
+          <input style="height: 28px; margin-bottom: 1px" type="text" width="100" name="lastname" placeholder="last name" />
+          <input style="height: 28px; margin-bottom: 1px" type="text" width="100" name="email" placeholder="me@me.com" />        
+          <input style="height: 28px; margin-bottom: 1px" type="password" width="100" name="password" placeholder="password" />
+          <input style="height: 28px; margin-bottom: 1px" type="password" width="100" name="checkpassword" placeholder="reenter password" />
+          <input type="submit"  style="margin-left: 0" id="submitImage" name="Login" width="100" placeholder="login" />
+      </div>
+  </form>
+  
+  </div>
+  <div>
+  <p>
+      <a href="/">
+          Forgot Password
+      </a>
+  </p>
+  </div>
+
+</div>
