@@ -6,6 +6,7 @@
 	</title>
 	
 	<link rel="stylesheet" href="/css/bootstrap.css" />
+	<link rel="stylesheet" href="/css/application.css" />
 	<script type="text/javascript" src="js/application.js"></script>
 	
 	
@@ -13,79 +14,83 @@
 </head>
 
 <body class = "fullbodydesign" >
+	<div class="container">
+		<div class="navbar navbar-fixed-top">
+			
+			<!-- This is to decide whether the person is logged in or not -->
 	
-	<div id="container" style="width: 800px">
-		
-		<!-- This is to decide whether the person is logged in or not -->
+			<% if login? %> 
+	
+				<div class="navbar-inner" style="width: 80%; margin-left: auto; margin-right: auto">
+					<div class="nav-collapse">
+							<ul class="nav">
 
-		<% if login? %> 
-
-			<div class="row" style="width: 80%; margin-left: auto; margin-right: auto">
-				<div class="span0" style="margin-left: 0px">
-					<h2>
-						<a href="/">HOME</a>
-					</h2>
-				</div>
-				<div class="span0" style="margin-left: 70px">
-					<h2>
-						<a href="/about">ABOUT</a>
-					</h2>
-				</div>
-				<div class="span2" style="margin-left: 50px">
-					<h2>
-						<a href="/courses">COURSES</a>
-					</h2>
-				</div>
-				<div class="span2" style="margin-left: 43px; width: 120; font-size: 15px; margin-top: 3px">
-					Hi, <%= firstname %> <%= lastname %>! 
-				</div>
-				<div class="span0" style="margin-top: 0px">
-					<a href="/profile" style="margin-left: 30px; font-size: 15px">PROFILE</a> 
-					||
-					<a href="/logout" style="margin-left: 0px; font-size: 15px">LOGOUT</a>
-				</div>
-			</div>
-
-		<% else %>
-
-			<div class="row" style="width: 100%; margin-left: auto; margin-right: auto">
-				<div class="span0" style="margin-left: 20px">
-					<h2>
-						<a href="/">HOME</a>
-					</h2>
-				</div>
-				<div class="span0" style="margin-left: 70px">
-					<h2>
-						<a href="/about">ABOUT</a>
-					</h2>
-				</div>
-				<div class="span2" style="margin-left: 50px">
-					<h2>
-						<a href="/courses">COURSES</a>
-					</h2>
-				</div>
-				<div class="span2" style="margin-left: 30px">
-					<h2>
-						<a href="/signup">SIGNUP</a>
-					</h2>
-				</div>
-				<form id="login" action="/login" method="POST">
-					<div class="span1 offset1" style="margin-left: 50px">
-						<input style="height: 28px; width: 150px; margin-bottom: 1px" type="text" width="100" name="email" placeholder="email" />
-						<input style="height: 28px; width: 150px; margin-bottom: 1px" type="password" width="100" name="password" placeholder="password" />
-						<input type="submit"  style="margin-left: 100" id="submitImage" name="Login" width="100" placeholder="login" />
+								<li>
+									<a href="/">HOME</a>
+								</li>
+								<li>
+									<a href="/about">ABOUT</a>
+								</li>
+								<li>
+									<a href="/courses">COURSES</a>
+								</li>
+								<div class="span2" style="margin-left: 43px; width: 120; font-size: 15px; margin-top: 3px">
+									Hi, <%= firstname %> <%= lastname %>! 
+								</div>
+								<div class="span0" style="margin-top: 0px">
+									<a href="/profile" style="margin-left: 30px; font-size: 15px">PROFILE</a> 
+										||
+									<a href="/logout" style="margin-left: 0px; font-size: 15px">LOGOUT</a>
+								</div>
+							</ul>
 					</div>
-				</form>
-
-			</div>
-
-		<% end %>
-
+				</div>
+			
+			<% else %>
+	
+				<div class="navbar-inner" style="width: 100%; margin-left: auto; margin-right: auto">
+					
+						<div class="nav-collapse">
+							
+							<ul class="nav" style="margin-top: 5px;">
+									<li>
+										<a href="/">HOME</a>
+									</li>
+									<li>
+										<a href="/about">ABOUT</a>
+									</li>
+									<li>
+										<a href="/courses">COURSES</a>
+									</li>
+									<li>
+										<a href="/signup">SIGNUP</a>
+									</li>
+								
+							</ul>
+							<form class="pull-right form-inline" style="margin-top:5px;" action="/login" method="POST">
+									<input style="input-small" style="width:150px" type="text" name="email" placeholder="email" />
+									<input style="input-small" style="width:150px" type="password" name="password" placeholder="password" />
+									<label class="checkbox" style="margin-top: 5px;">
+    									<input type="checkbox"> Remember me
+  									</label>
+									<button type="submit"  class="btn">Sign in</button>
+							</form>
+							
+						</div>
+				</div>
+	
+			<% end %>
+	
+		</div>
+	
+		<div class="undernavbar">
+	
+			<%= yield %>
+	
+			<script type="text/javascript" src="http://code.jquery.com/jquery.js"></script>
+			<script type="text/javascript" src="/js/bootstrap.js"></script>
+		
+		</div>
 	</div>
-
-<%= yield %>
-<script type="text/javascript" src="http://code.jquery.com/jquery.js"></script>
-<script type="text/javascript" src="/js/bootstrap.js"></script>
-
 </body>
 </html>

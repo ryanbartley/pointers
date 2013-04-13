@@ -177,7 +177,7 @@ post "/login" do
         @p = match
         #raise Exception, @p
         
-        if @p.password_hash == BCrypt::Engine.hash_secret(params[:password], @p.password_salt)
+        if @p.password = params[:password]
             
             session[:email] = @p.email
             session[:firstname] = @p.firstname.capitalize
@@ -244,7 +244,7 @@ post '/updateprofile' do
             end
         end
 
-        redirect "http://itp.nyu.edu/~rtb288/sinatra/grandio/profile"
+        redirect "/profile"
 
     else
         
@@ -258,6 +258,6 @@ get '/logout' do
     session[:firstname] = nil
     session[:lastname] = nil
     session[:email] = nil
-    redirect "http://itp.nyu.edu/~rtb288/sinatra/grandio/"
+    redirect "/"
 
 end
