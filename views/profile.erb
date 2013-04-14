@@ -1,49 +1,36 @@
 <div class="container" >
 
     <div class="row clearfix" >
-        <h1> 
+        <legend>
             <%= @page_heading %> 
-        </h1>
-        
-        <br>
-    
-        <form id="login" action="/updateprofile" method="POST">
-                  
-            <div class="span2 offset1">
-                <input style="height: 28px; margin-bottom: 1px" type="text" width="100" name="firstname" value="<%= @p.firstname.capitalize %>" />
-                <input style="height: 28px; margin-bottom: 1px" type="text" width="100" name="lastname" value="<%= @p.lastname.capitalize %>" />
-                <input style="height: 28px; margin-bottom: 1px" type="text" width="100" name="email" value="<%= @p.email %>" />        
-                <input style="height: 28px; margin-bottom: 1px" type="password" width="100" name="password" placeholder="change password" />
-                <input style="height: 28px; margin-bottom: 1px" type="password" width="100" name="checkpassword" placeholder="reenter changed password" />
-                <select name="interests" style="width: 210px">
-                    <% if @p.interest1 %>
-                        <option value="<%= @p.interest1 %>"><%= @p.interest1 %></option>
-                    <% else %>
-                        <option value="choose">Choose an interest</option>
-                    <% end %>
-                    <option value="Computers">Computers</option>
-                    <option value="Electronics">Electronics</option>
-                    <option value="Literature">Literature</option>
-                    <option value="Mathematics">Mathematics</option>
-                    <option value="Fabrication">Fabrication</option>
-                    <option value="Biking">Biking</option>
-                    <option value="Science">Science</option>
-                    <option value="Philosophy">Philosophy</option>
-                </select>
-                <br>
-                <div style="width: 220px">
-                    Would you like to teach?
-                    <% if @p.teacher == "true" %>
-                        <input type="radio" name="group1" value="true" checked> Yes <br>
-                        <input type="radio" name="group1" value="false"> No <br>
-                    <% else %>
-                        <input type="radio" name="group1" value="true"> Yes <br>
-                        <input type="radio" name="group1" value="false" checked> No <br>
-                    <% end %>
+        </legend>
+
+        <div class="well">
+            <div class="row">
+                <div class="span1"><a  class="thumbnail"><img src=<%= @p.propic %> alt=""></a></div>
+                    <div class="span6">
+                        <% if @p.teacher == true %>
+                            <p>teacher</p>
+                        <% else %>
+                            <p>learner</p>
+                        <% end %>
+                        <p><strong><%= @p.firstname.capitalize %> <%= @p.lastname.capitalize %></strong></p>
+                        <p><%= @p.email %></p>
+                        
+                        <label style="">Interests</label>
+                        <legend></legend>
+                            <p><%= @p.interest1 %></p>
+                        <span class="badge badge-warning">8 messages</span> <span class="badge badge-info">15 followers</span>
+                        <div class="control-group" style="margin-top: 10px;">
+                            <label class="control-label" ></label>
+                            <div class="controls">
+                                <a class="btn btn-primary" href="/changeprofile">Change Profile</a>
+                                <a class="btn" href="/courses">Check Out Classes</a>
+                            </div>
+                        </div>
+                        
                 </div>
-                <input type="submit"  id="submitImage" name="Update" width="100" value="update" />    
             </div>
-        
-        </form>
+        </div>
     </div>
 </div>

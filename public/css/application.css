@@ -8,6 +8,42 @@ body {
 
 .undernavbar {
 	margin-top: 50px;
-	margin-left: 50px;
-	margin-right: 50px;
+	margin-left: 0px;
+	margin-right: 0px;
+	padding-left: 0px;
+}
+
+.siteTitle{
+	line-height: 40px;
+	margin-left: 10px;
+	margin-right: 40px;
+	font-size: 30px;
+	font-family: 'Syncopate', sans-serif;
+}
+
+.siteNameControl{
+	float: right;
+	font-size: 14px;
+	line-height: 40px;
+}
+
+.siteName{
+	padding-right: 5px;
+}
+
+.aboutText{
+	font-family: 'Strait', sans-serif;
+	font-size: 20px;
+}
+
+.loginForm{
+	margin-right: 10px;
+	margin-left: 10px;
+	margin-bottom: 5px;
+	margin-top: 5px;
+}
+
+.loginForm > label {
+	margin-top: 5px;
+	margin-bottom: 0px;
 }

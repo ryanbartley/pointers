@@ -1,0 +1,112 @@
+<div class="container" >
+
+    <div class="row clearfix" >
+        <legend>
+            <%= @page_heading %> 
+        </legend>
+   
+        <form id="updateprofile" class="form-horizontal" action="/updateprofile" method="POST">
+            <div class="control-group">
+                <label class="control-label" for="firstname">First Name</label>
+                <div class="controls">
+                    <input class="input-large" id="firstname" type="text" name="firstname" value="<%= @p.firstname.capitalize %>" />
+                </div>
+            </div>
+            
+
+            <div class="control-group">
+                <label class="control-label" for="lastname">Last Name</label>
+                <div class="controls">
+                    <input class="input-large" id="lastname" type="text" name="lastname" value="<%= @p.lastname.capitalize %>" />
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label" for="email">Email</label>
+                <div class="controls">
+                    <input class="input-large" id"email" type="text" name="email" value="<%= @p.email %>" /> 
+                </div>
+            </div>
+            <span id="spanemail"></span>
+
+            <div class="control-group">
+                <label class="control-label" for="prepassword">Previous Password</label>
+                <div class="controls">
+                    <input class="input-large" id="prepassword" type="password" name="password" placeholder="previous password" />
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <label class="control-label" for="newpassword">New Password</label>
+                <div class="controls">
+                    <input class="input-large" id="newpassword" type="password"  name="newpassword" placeholder="new password" />
+                </div>
+            </div>
+        
+            <div class="control-group">
+                <label class="control-label" for="propic">Profile Picture</label>
+                <div class="controls">
+                    <input class="input-large" id="propic" type="text"  name="propic" value="<%= @p.propic %>" />
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label" for="interests">Interests</label>
+                <div class="controls">
+                    <select id="interests" name="interests" style="width: 210px">
+                        <% if @p.interest1 %>
+                            <option value="<%= @p.interest1 %>"><%= @p.interest1 %></option>
+                        <% else %>
+                            <option value="choose">Choose an interest</option>
+                        <% end %>
+                        <option value="Computers">Computers</option>
+                        <option value="Electronics">Electronics</option>
+                        <option value="Literature">Literature</option>
+                        <option value="Mathematics">Mathematics</option>
+                        <option value="Fabrication">Fabrication</option>
+                        <option value="Biking">Biking</option>
+                        <option value="Science">Science</option>
+                        <option value="Philosophy">Philosophy</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label" for="teach">Would you like to teach?</label>
+                <div class="controls">
+                    <% if @p.teacher == true %>
+                        <label class="radio">
+                            <input type="radio" name="teach" id="optionsRadios1" value="true" checked>
+                                Yes
+                        </label>
+                        <label class="radio">
+                            <input type="radio" name="teach" id="optionsRadios2" value="false">
+                                No
+                        </label>
+                    <% else %>
+                        <label class="radio">
+                            <input type="radio" name="teach" id="optionsRadios1" value="true">
+                                Yes
+                        </label>
+                        <label class="radio">
+                            <input type="radio" name="teach" id="optionsRadios2" value="false" checked>
+                                No
+                        </label>
+                    <% end %>
+                </div>
+            </div>
+                
+                <div class="form-actions" style="padding-left: 10px;">
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                    <button type="button" class="btn">Cancel</button>
+                </div> 
+            </div>
+            <script>
+ 
+            
+            </script>
+            
+        
+        </form>
+    </div>
+</div>

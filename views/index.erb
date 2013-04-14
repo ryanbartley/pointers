@@ -1,7 +1,26 @@
 <div id="frame">
+	<script>
+    $(document).ready(function () {
+        $('label.tree-toggler').click(function () {
+            $(this).parent().children('ul.tree').toggle(300);
+        });
+    });
+	</script>
+	<div class="well" style="width:300px; padding: 8px 0; float: right;">
+    	<div style="overflow-y: scroll; overflow-x: hidden; height: 100px;">
+    	    <ul class="nav nav-list">
 	
-	<h1>
-		POINTERS*
-	</h1>
+				<% @classes.each do |course| %>
+    					<li><label class="tree-toggler nav-header"><%= course.title %></label>
+    			            <ul class="nav nav-list tree">
+    			                <li><a href="/courses/<%= course.title %>">Read More</a></li>
+    			            </ul>
+    			        </li>
+    			        <li class="divider"></li>
+    			<% end %>
+
+    		</ul>
+    	</div>
+	</div>
 
 </div>

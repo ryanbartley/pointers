@@ -1,0 +1,37 @@
+<div id="frame">
+
+	<legend>COURSES<span style="float:right;"><a href="/addcourse">Add Course</a></span></legend>
+
+
+	<% @courses.each do |course| %>
+	
+		<div class="row-fluid">
+			<div class="well">
+				<h2 class="muted"><%= course.title %></h2>
+				<p><span class="label"><%= course.interest %></span></p>
+				<ul>
+					<li><%= course.location %></li>
+					<li><%= course.totstu %> students total</li>
+					<li>Need: Food</li>
+					<li>Streaming</li>
+				</ul>          
+				<p><%= course.description %></p>
+				<hr>
+				<h3><%= course.date.strftime("%A %m/%d/%y") %></h3>
+				<hr>
+				<p><a class="btn btn-large" href="/courses/<%= course.title %>"><i class="icon-ok"></i>Check It Out</a></p>
+			</div>
+		</div>
+	
+	<% end %>
+	
+
+	<% if @addcourses %>
+
+	<h2>
+		
+	</h2>
+
+	<% end %>
+
+</div>

@@ -4385,7 +4385,10 @@ input[type="submit"].btn.btn-mini {
 
 .navbar-inner:before,
 .navbar-inner:after {
-  display: table;
+  /*jz fucked this up*/
+  /*display: table;*/
+  display: inline;
+  padding-bottom: 10px;
   line-height: 0;
   content: "";
 }
@@ -4551,6 +4554,7 @@ input[type="submit"].btn.btn-mini {
 
 .navbar-fixed-top .navbar-inner,
 .navbar-fixed-bottom .navbar-inner {
+  padding-bottom: 7;
   padding-right: 0;
   padding-left: 0;
   -webkit-border-radius: 0;

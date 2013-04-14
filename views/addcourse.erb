@@ -1,0 +1,63 @@
+<div>
+  <legend>ADD A COURSE</legend>
+  <form class="form-horizontal" id="addproject" action="/newcourse" method="post">
+      <div class="control-group">
+          <label class="control-label" for="title" style="width:100px;">Title</label>
+          <div class="controls" style="margin-left:120px;">
+              <input class="input-large" id="title" type="text" name="title" value="" />
+          </div>
+      </div>
+    
+      <div class="control-group">
+          <label class="control-label" for="date" style="width:100px;">Date</label>
+          <div class="controls" style="margin-left:120px;">
+              <input class="input-large" id="date" type="date" name="date" value="" />
+          </div>
+      </div>
+
+      <div class="control-group">
+          <label class="control-label" for="totstu" style="width:100px;">Total Students</label>
+          <div class="controls" style="margin-left:120px;">
+              <input class="input-large" id="totstu" type="text" name="totstu" value="" />
+          </div>
+      </div>
+
+      <div class="control-group">
+          <label class="control-label" for="location" style="width:100px;">Location</label>
+          <div class="controls" style="margin-left:120px;">
+              <input class="input-large" id="location" type="text" name="location" value="" />
+          </div>
+      </div>
+     
+      <div class="control-group">
+          <label class="control-label" for="date" style="width:100px;">Description</label>
+          <div class="controls" style="margin-left:120px;">
+              <textarea style="width: 210px" rows="6" cols="80" name="description"></textarea>
+          </div>
+      </div>
+
+      <div class="control-group">
+                <label class="control-label" for="interests" style="width:100px;">Interests</label>
+                <div class="controls" style="margin-left:120px;">
+                    <select id="interests" name="interests" style="width: 210px">
+                        <option value="choose">Choose an interest</option>
+                        <option value="Computers">Computers</option>
+                        <option value="Electronics">Electronics</option>
+                        <option value="Literature">Literature</option>
+                        <option value="Mathematics">Mathematics</option>
+                        <option value="Fabrication">Fabrication</option>
+                        <option value="Biking">Biking</option>
+                        <option value="Science">Science</option>
+                        <option value="Philosophy">Philosophy</option>
+                    </select>
+                </div>
+            </div>
+      
+      <div class="form-actions" style="padding-left: 10px;">
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                    <a type="button" class="btn" href="/courses">Cancel</a>
+                </div> 
+            </div>
+    </div>
+  </form>
+</div>

@@ -54,7 +54,7 @@ end
 
 def upcomingCoursesFunc
 
-    Course.all(:order => [ :date.asc ])
+    Course.all(:order => [ :date.desc ])
     #count up all the courses that are in the next
     #couple of days so that we can display them to
     #people coming to the site
@@ -87,9 +87,11 @@ end
 # Main route  - this is the form where we take the input
 get '/' do
 
-  @page_title = "Pointers*"
+    @page_title = "Pointers*"
   
-  erb :index
+    @classes = Course.now
+
+    erb :index
   
 end
 
@@ -125,6 +127,7 @@ post "/signedup" do
         session[:email] = params[:email]
         # raise Exception, session[:email]
         
+
         #create a new person entry
         @p = Person.new(:firstname => params[:firstname], 
                           :lastname => params[:lastname], 
@@ -177,23 +180,30 @@ post "/login" do
         @p = match
         #raise Exception, @p
         
-        if @p.password = params[:password]
+        if @p.password == params[:password]
             
             session[:email] = @p.email
             session[:firstname] = @p.firstname.capitalize
             session[:lastname] = @p.lastname.capitalize
-            
+            #create the date to sort against
+
             redirect "/profile"
             
         else 
-  
-            "The Password didn't match"
-        
+
+            @page_title = "Please Check Password"
+            @page_heading = "Please Check Password"
+            @forgotPassword = "Forgot Password?"
+            erb :login
+
         end
     
     else
     
-        "You didn't get a match"
+        @page_title = "Please Check email"
+        @page_heading = "That email is already in use!"
+        @forgotPassword = "Forgot Password?"
+        erb :login   
     
     end
 
@@ -209,36 +219,78 @@ get '/profile' do
         @page_heading = "Your Profile"
         erb :profile
     else 
-        "You need to login"
+        session[:email] = nil
+        @page_title = "Please Login"
+        @page_heading = "Please Login"
+        erb :login 
     end
 
 end
 
+get '/changeprofile' do
+
+    @p = Person.first(:email => session[:email])
+
+    if @p 
+        #raise Exception, @p
+        @page_title = "Change Your Profile"
+        @page_heading = "Change Your Profile"
+        erb :changeprofile
+    else 
+        session[:email] = nil
+        @page_title = "Please Login"
+        @page_heading = "Please Login"
+        erb :login 
+    end
+
+end
+
+
+####### There are still errors with changing your password ################
 post '/updateprofile' do
 
     p = Person.first(:email => session[:email])
 
     if p
 
-        if params[:password] != "" && params[:checkpassword] != ""
-            if p.update(:firstname => params[:firstname], 
+        if params[:teach] == "true"
+            teach = true
+        else 
+            teach = false
+        end
+    
+        if p.email != params[:email]
+            session[:email] = params[:email]
+        end
+
+        if params[:password] != "" && params[:newpassword] != ""
+            if p.password == params[:password]
+                if p.update(:firstname => params[:firstname], 
                     :lastname => params[:lastname], 
                     :email => params[:email],
-                    :password_salt => params[:password],
-                    :password_hash => params[:checkpassword],
-                    :teacher => params[:group1], 
-                    :interest1 => params[:interests])
-            else
-                raise Exception, p.errors.inspect
+                    :password => params[:newpassword],
+                    :teacher => params[:group1],
+                    :propic => params[:propic], 
+                    :interest1 => params[:interests],
+                    :teacher => teach)
+                else
+                    raise Exception, p.errors.inspect
+                end
+            else 
+                @p = p
+                @page_title = "Change Your Profile"
+                @page_heading = "You didn't enter your password correctly!"
+                erb :changeprofile
             end
+            
         else
             if p.update(:firstname => params[:firstname], 
                     :lastname => params[:lastname], 
                     :email => params[:email],
-                    :password_salt => p.password_salt,
-                    :password_hash => p.password_hash,
                     :teacher => params[:group1], 
-                    :interest1 => params[:interests])
+                    :propic => params[:propic], 
+                    :interest1 => params[:interests],
+                    :teacher => teach)
             else
                 raise Exception, p.errors.inspect
             end
@@ -248,9 +300,92 @@ post '/updateprofile' do
 
     else
         
-        "You didn't update anything idiot"
+        session[:firstname] = nil
+        session[:lastname] = nil
+        session[:email] = nil
+        @page_title = "Please Login"
+        @page_heading = "Please Login"
+        erb :login 
+        
     end
 
+end
+
+get '/addcourse' do
+  
+    @page_title = "Add Course"
+    erb :addcourse
+  
+end
+
+get '/courses' do
+  
+    if session[:email]
+      p = Person.first(:email => session[:email])
+  
+      if p.teacher == true
+          @addcourses = true
+      else 
+          @addcourses = false
+      end
+    end
+  
+      @courses = Course.all(:order=>[:date.asc])
+      @page_title = "Courses"
+      
+      erb :courses
+  
+end
+
+get '/courses/:title' do
+
+    @courses = Course.all 
+    @this_course = Course.first(:title => params[:title])
+    #raise Exception, @date = @this_course.strftime([format='%A %d %b %Y'])
+    @page_title = ":title"
+  
+    erb :single_course
+
+end
+
+post '/newcourse' do
+  
+    p = Person.first(:email => session[:email])
+    
+    if p.teacher == true
+  
+        
+      if @course = Course.new(:date => params[:date],
+                             :totstu => params[:totstu],
+                             :location => params[:location],
+                             :instructorfirst => p.firstname,
+                             :instructorlast => p.lastname,
+                             :title => params[:title],
+                             :description => params[:description],
+                             :interest => params[:interest])
+        
+        if @course.persons << p 
+            
+          if p.courses << @course
+
+            if @course.save && p.save
+                redirect "/courses"
+            else
+                raise Exception, "I'm inside"
+                "Your course didn't save." 
+            end
+          else
+            "Your courses didn't setup with the person"
+          end
+        else
+            "It didn't save"
+        end
+      else
+        raise Exception, course.errors.inspect
+      end
+    else
+        "You're not a teacher"
+    end     
 end
 
 get '/logout' do

@@ -1,30 +1,74 @@
 <div id="container" style="height: 300">
 
-  <h1> 
+  <legend> 
       <%= @page_heading %> 
-  </h1>
+  </legend>
   
   <br>
   <div>
   
-  <form id="login" action="/signedup" method="POST" style="overflow-y:auto;">
+  <form class="form-horizontal" id="signup" action="/signedup" method="POST" style="overflow-y:auto;">
             
-      <div class="span1 offset1">
-          <input style="height: 28px; margin-bottom: 1px" type="text" width="100" name="firstname" placeholder="first name" onblur="javascript:checkFirstName(this)" />
-          <input style="height: 28px; margin-bottom: 1px" type="text" width="100" name="lastname" placeholder="last name" />
-          <input style="height: 28px; margin-bottom: 1px" type="text" width="100" name="email" placeholder="me@me.com" />        
-          <input style="height: 28px; margin-bottom: 1px" type="password" width="100" name="password" placeholder="password" />
-          <input style="height: 28px; margin-bottom: 1px" type="password" width="100" name="checkpassword" placeholder="reenter password" />
-          <input type="submit"  style="margin-left: 0" id="submitImage" name="Login" width="100" placeholder="login" />
-      </div>
+          <div class="control-group">
+              <label class="control-label" for="firstname" style="width:100px;">First Name</label>
+              <div class="controls" style="margin-left:120px;">
+                  <input class="input-large" type="text" name="firstname" id="firstname" onblur="javascript:checkFirstName(this)" />
+              </div>
+          </div>
+
+          <div class="control-group">
+              <label class="control-label" for="lastname" style="width:100px;">Last Name</label>
+              <div class="controls" style="margin-left:120px;">
+                  <input class="input-large" type="text" id="lastname" name="lastname" />
+              </div>
+          </div>
+
+          <div class="control-group">
+              <label class="control-label" for="email" style="width:100px;">Email</label>
+              <div class="controls" style="margin-left:120px;">
+                  <input class="input-large" id="email" type="text" name="email" /> 
+              </div>
+          </div>
+
+          <div class="control-group">
+              <label class="control-label" for="password" style="width:100px;">Password</label>
+              <div class="controls" style="margin-left:120px;">
+                  <input class="input-large" id="password" type="password" name="password" />
+              </div>
+          </div>
+
+          <div class="control-group">
+              <label class="control-label" for="checkpassword" style="width:100px;">Reenter Password</label>
+              <div class="controls" style="margin-left:120px;">
+                  <input class="input-large" type="password" id="checkpassword" name="checkpassword" />
+              </div>
+          </div>
+
+          <div class="control-group">
+              <label class="control-label" for="location" style="width:100px;">Location</label>
+              <div class="controls" style="margin-left:120px;">
+                  <input class="input-large" type="text" name="location" id="location" />
+              </div>
+          </div>
+          
+          <label><input type="checkbox" name="terms"> I agree with the <a href="#">Terms and Conditions</a>.</label>
+          <div class="form-actions" style="padding-left: 10px;">
+
+                <button type="submit" class="btn btn-primary">Save changes</button>
+                <a type="button" class="btn" href="/courses">Cancel</a>
+                <div style="float:right;">
+                    <a href="/">
+                        Forgot Password
+                    </a>
+                </div>
+          </div> 
+         
   </form>
   
   </div>
   <div>
   <p>
-      <a href="/">
-          Forgot Password
-      </a>
+      
   </p>
   </div>
 
