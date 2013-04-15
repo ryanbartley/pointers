@@ -89,7 +89,10 @@ get '/' do
 
     @page_title = "Pointers*"
   
+    @google_map_key = "AIzaSyB-vkhfS6BiwMLzMCrkeAQJpnjxmQn8U4Y"
     @classes = Course.now
+
+    @count = @classes.count
 
     erb :index
   
@@ -395,4 +398,14 @@ get '/logout' do
     session[:email] = nil
     redirect "/"
 
+end
+
+get '/test_associations' do
+    CoursePerson.all(:person_id => 5) do |course|
+        puts course
+    end
+end
+
+get '/test_ajax' do
+    @course = Course.all
 end

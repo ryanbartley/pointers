@@ -1,26 +1,92 @@
 <div id="frame">
-	<script>
+
+    <div class="span6" id="map-canvas"></div>
+	       
+    <div class="span6" style="float:right; margin-left: 5px;">
+        <legend>What Can I Learn?</legend>
+	    <div class="well indexCourses" style=" padding: 8px 0; ">
+
+        	<div class="" style="overflow-y: scroll; overflow-x: hidden;">
+        	    <ul class="nav nav-list">
+	                <% i = 0 %>
+				    <% @classes.each do |course| %>
+
+        			    <li><label class="tree-toggler nav-header"><%= course.title %><div class="pull-right"><%= course.interest %></div></label>
+
+        			        <ul class="nav nav-list tree">
+                                <li><%= course.description %></li>
+        			            <li><a href="/courses/<%= course.title %>">Read More</a></li>
+        			        </ul>
+        			    </li>
+                        <% i+=1 %>
+                        <% if i < @count %> 
+        			        <li class="divider"></li>
+                        <% end %>
+        			<% end %>
+
+        		</ul>
+        	</div>
+	    </div>
+    </div>
+</div>
+
+<div id="ajaxExample"></div>
+<button type="button" onclick="loadXMLDoc()">Change Content</button>
+<!-- FIRST AJAX EXAMPLE-->
+<script>
+function loadXMLDoc()
+{
+var xmlhttp;
+var txt,x,i;
+xmlhttp=new XMLHttpRequest();
+  
+xmlhttp.onreadystatechange=function()
+  {
+  if (xmlhttp.readyState==4 && xmlhttp.status==200)
+    {
+    document.getElementById("ajaxExample").innerHTML=xmlhttp.responseText;
+    }
+  }
+xmlhttp.open("GET","/test_ajax",true);
+xmlhttp.send();
+}
+</script>
+
+<!-- THIS RUNS THE CLASSES ON THE RIGHT -->
+<script>
     $(document).ready(function () {
+        $('ul.tree').toggle(300);
+
         $('label.tree-toggler').click(function () {
             $(this).parent().children('ul.tree').toggle(300);
         });
     });
-	</script>
-	<div class="well" style="width:300px; padding: 8px 0; float: right;">
-    	<div style="overflow-y: scroll; overflow-x: hidden; height: 100px;">
-    	    <ul class="nav nav-list">
-	
-				<% @classes.each do |course| %>
-    					<li><label class="tree-toggler nav-header"><%= course.title %></label>
-    			            <ul class="nav nav-list tree">
-    			                <li><a href="/courses/<%= course.title %>">Read More</a></li>
-    			            </ul>
-    			        </li>
-    			        <li class="divider"></li>
-    			<% end %>
+</script>
 
-    		</ul>
-    	</div>
-	</div>
+<!-- THIS RUNS THE GOOGLE MAPS -->
+<script type="text/javascript" src="//maps.googleapis.com/maps/api/js?sensor=false&key=<%= @google_map_key %>">
+</script>
+<script type="text/javascript">
 
-</div>
+function initialize() {
+    // create the geocoder
+    geocoder = new google.maps.Geocoder();
+
+    var mapOptions = {
+      center: new google.maps.LatLng(40.74649,-74.0094),
+      zoom: 7,
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+    };
+
+    // create the map
+    map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+
+    // this is a custom function for the demo, uncomment when ready.
+    // fetch the existing places and put them on the map
+    // fetchPlaces();
+}
+
+// set page ready trigger
+google.maps.event.addDomListener(window, 'load', initialize);
+
+</script>

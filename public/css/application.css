@@ -13,6 +13,56 @@ body {
 	padding-left: 0px;
 }
 
+
+.well{
+
+	height: 400px;
+
+}
+
+.well .desc{
+
+	height: 200px;
+
+}
+
+.well .course-title{
+
+	height: 100px;
+	font-size: auto;
+	margin: auto;
+	text-align: left;
+	color: #00688B;
+
+}
+
+
+.well:hover{background-color:#cfcfcf;
+        -webkit-transition: background 0.15s linear;
+        -moz-transition: background 0.15s linear;
+        -ms-transition: background 0.15s linear;
+        -o-transition: background 0.15s linear;
+        transition: background 0.15s linear;;}
+a .link{
+
+	display:block;
+	height: 400px;
+	width: 100px;
+}
+
+a,
+a:hover, 
+a:visited,
+a:active{
+	color: #000000;
+		text-decoration: none;
+
+
+}
+
+
+
+
 .siteTitle{
 	line-height: 40px;
 	margin-left: 10px;
