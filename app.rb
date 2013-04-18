@@ -3,6 +3,7 @@ require 'bundler'
 Bundler.require
 require 'bcrypt'
 require 'date'
+require 'dm-serializer/to_json'
 require './database.rb'
 
 set :root, File.dirname(__FILE__)
@@ -81,6 +82,11 @@ def upcomingCoursesFunc
 
 end
 
+def getLocation(courses)
+    #this will change to get specific courses
+    return courses = Courses.all
+end
+
 
 #-------------------------------------------------------
 # Routes to take!
@@ -89,7 +95,10 @@ get '/' do
 
     @page_title = "Pointers*"
   
+    @google_map_key = "AIzaSyB-vkhfS6BiwMLzMCrkeAQJpnjxmQn8U4Y"
     @classes = Course.now
+
+    @count = @classes.count
 
     erb :index
   
@@ -321,13 +330,23 @@ end
 get '/courses' do
   
     if session[:email]
-      p = Person.first(:email => session[:email])
-  
-      if p.teacher == true
-          @addcourses = true
-      else 
-          @addcourses = false
-      end
+        p = Person.first(:email => session[:email])
+
+        ###################################
+        #######-----TO DO:---------########
+        #sort out the classes that are too far away
+        @courses = Course.all(:order=>[:date.asc])
+        @nearbyCourses = getLocation(@courses)
+
+        if p.teacher == true
+            @addcourses = true
+        else 
+            @addcourses = false
+        end
+        @page_title = "Courses"
+    else
+        @courses = Course.all(:order=>[:date.asc])
+        @page_title = "Courses"
     end
   
       @courses = Course.all(:order=>[:date.asc])
@@ -343,6 +362,8 @@ get '/courses/:title' do
     @this_course = Course.first(:title => params[:title])
     #raise Exception, @date = @this_course.strftime([format='%A %d %b %Y'])
     @page_title = ":title"
+
+    @count = @courses.count
   
     erb :single_course
 
@@ -363,6 +384,9 @@ post '/newcourse' do
                              :title => params[:title],
                              :description => params[:description],
                              :interest => params[:interest])
+
+        #CoursePerson.create(:person => p, :course => @course, :type => :teacher)
+
         
         if @course.persons << p 
             
@@ -388,11 +412,30 @@ post '/newcourse' do
     end     
 end
 
+get '/enrollclass' do
+
+    refer = "#{env['HTTP_REFERER']}"
+    
+end
+
 get '/logout' do
 
     session[:firstname] = nil
     session[:lastname] = nil
     session[:email] = nil
     redirect "/"
+
+end
+
+get '/test_associations' do
+    CoursePerson.all(:person_id => 5) do |course|
+        puts course
+    end
+end
+
+get '/test_ajax' do
+    
+    @course = Course.all
+
 
 end
