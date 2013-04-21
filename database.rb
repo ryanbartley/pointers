@@ -2,64 +2,396 @@ DataMapper::setup(:default, ENV['DATABASE_URL'] || "sqlite://#{Dir.pwd}/developm
 
 DataMapper::Model.raise_on_save_failure = true
 
+class CoursePerson
+  include DataMapper::Resource
+
+  property :course_id,  Integer, :key => true
+  property :person_id,  Integer, :key => true
+  property :type,       String,  :default => "student"
+
+  belongs_to :person, :child_key => [:person_id]
+  belongs_to :course, :child_key => [:course_id]
+end
+
 class Person
   include DataMapper::Resource
   include BCrypt
   
-  property :id            , Serial
+  property :id            , Serial  , :key => true
   property :firstname     , String  , :required => true, :length => 255
   property :lastname      , String  , :required => true, :length => 255
   property :email         , String  , :required => true, :length => 255
   property :password      , BCryptHash
+  property :location      , String
+  property :created_at    , DateTime
+  property :lastLogin     , DateTime
   property :teacher       , Boolean , :default => false
   property :propic        , String  , :length => 255, :default => "http://critterapp.pagodabox.com/img/user.jpg"
-  #we need to implement this.
-  property :like          , Integer 
-  property :interest1     , String  , :length => 255
-  property :interest2     , String  , :length => 255
-  property :interest3     , String  , :length => 255
-  property :interest4     , String  , :length => 255
+  property :totalrating   , Integer , :default => 0
+  property :totalrated    , Integer , :default => 0
 
-  #belongs_to :courses     , :required => false
+  class Link
 
-  has n, :courses, :through => Resource
+    include DataMapper::Resource
 
+    storage_names[:default] = 'people_links'
+
+    # the person who is following someone
+    belongs_to :follower, 'Person', :key => true
+
+    # the person who is followed by someone
+    belongs_to :followed, 'Person', :key => true
+
+  end
+
+  ##################################################
+  ####### ASSOCIATIONS #############################
+  ##################################################
+
+  #########---------PEOPLE ASSOCIATIONS---------#########
+  #TO DO: BOTH OF THESE LINK BOTH OF THEM TO EACH OTHER.
+  #YOU SHOULD BE ABLE TO FOLLOW SOMEONE WITHOUT THEM FOLLOWING
+  #YOU.
+  has n, :links_to_followed_people, 
+    'Person::Link', 
+    :child_key => [:follower_id],
+    :required => false
+
+  has n, :links_to_followers, 
+    'Person::Link', 
+    :child_key => [:followed_id],
+    :required => false
+
+
+  has n, :followed_people, self,
+    :through => :links_to_followed_people, # The person is a follower
+    :via     => :followed
+
+  has n, :followers, self,
+    :through => :links_to_followers, # The person is followed by someone
+    :via     => :follower
+  
+  ########------COURSE ASSOCIATION------------######
+  has n, :courses, :through => :course_person, :required => false
+
+
+  #TO DO - INBOX DOESN'T WORK FOR SOME REASON
+  #######------MESSAGE ASSOCIATION------------######
+  has n, :inbox, 'Message', :child_key => [ :target_id ], :order => :date.desc
+  has n, :sent, 'Message', :child_key => [ :source_id ], :order => :date.desc
+
+  ######-------COMMENTS ASSOCIATION-------##########
+  has n, :comments
+
+  ######-------PROFILE ASSOCIATION--------##########
+  has 1, :profile
+
+  ######-------INTERESTS ASSOCIATION------##########
+  has n, :interests, :through => Resource
+
+
+  ##################################################
+  ####### HELPER FUNCTIONS #########################
+  ##################################################
+
+  #######---------BEFORE SAVE----------------#######
   before :save do
-    self.email = self.email.downcase
+    
+  end
+
+  def createPerson(firstname, lastname, email, password, location, propic)
+    self.firstname = firstname
+    self.lastname = lastname
+    self.email = email.downcase
+    self.password = password
+    self.location = location
+    self.propic = propic
+    created_at = DateTime.now
+    lastLogin = created_at
+    self.setProfile
+  end
+
+  def loginProfile
+    self.lastLogin = DateTime.now
+  end
+
+  #######---------INTERESTS HELPERS----------#######
+  def setInterest(interest)
+    self.interests << interest
+    self.save
+  end
+
+  #TO DO: DELETE INTEREST
+  def deleteInterest(interest)
+
+  end
+
+  #######---------FOLLOWERS HELPERS----------#######
+  def getFollowers
+    followers.count
+  end
+
+  def getFollowerPeople
+    followers.all 
+  end
+
+  def getFollowed
+    followed_people.count
+  end
+
+  def getFollowingPeople
+    followed_people.all 
+  end
+
+  def follow(others)
+    followed_people.concat(Array(others))
+    save
+    self
+  end
+
+  def unfollow(others)
+    links_to_followed_people.all(:followed => Array(others)).destroy!
+    reload
+    self
+  end
+
+  #######--------RATING FUNCTIONS------------#######
+  def addRatings(rating) 
+    self.totalrating += rating
+    self.totalrated += 1
+  end
+
+  def curTotRating
+    (self.totalrating / self.totalrated)
+  end
+
+  #######--------MESSAGE FUNCTIONS-----------########
+
+  def getInbox
+    self.inbox
+  end
+
+  def getSent
+    self.sent
+  end
+
+  ########-------COURSE FUNCTIONS------------########
+  def getStuClasses
+    self.course_person.all(:type => "student").course
+  end
+
+  def getTeachClasses
+    self.course_person.all(:type => "teacher").courses
   end
 
   def becomingATeacher
     @teacher = true
   end
 
+  ########-------PROFILE FUNCTIONS----------########
+  def getProfile
+    self.profile.slug
+  end
+
+  def setProfile
+    p = Profile.new
+    p.slug = self.firstname + self.lastname
+    self.profile = p 
+    self.save
+  end
+
 end
 
+class Profile
+  include DataMapper::Resource
+
+  property :id   , Serial, :key => true
+  property :slug , String, :required => true 
+
+  belongs_to :person 
+end
 
 class Course
   include DataMapper::Resource
 
-  property :slug            , String,    :key => true, :unique_index => true, :default => lambda { | resource, prop| resource.title.downcase.gsub " ", "-" }
+  property :id              , Serial,    :key => true
+  property :slug            , String,    :default => lambda { | resource, prop| resource.title.downcase.gsub " ", "_" }
   property :title           , String,    :required => true
   property :date            , DateTime,  :required => true
-  property :totstu          , String,    :required => false
-  property :location        , String,    :required => false
-  property :instructorfirst , String,    :required => true
-  property :instructorlast  , String,    :required => true
+  property :created_at      , DateTime   #This should be required.
+  property :totstu          , String
+  property :location        , String    
+  property :coursepic       , String,    :length => 255
   property :description     , Text,      :required => true
-  property :interest        , String,    :required => false
   
-  
-  has n, :persons, :through => Resource
+  ##################################################
+  ####### ASSOCIATIONS #############################
+  ##################################################
 
+  ######------PERSON ASSOCIATION---------###########
+  has n, :persons, :through => :course_person
+
+  ######------COMMENTS ASSOCIATION---------#########
+  has n, :comments, :order => :date.desc
+
+  ######------interestS ASSOCIATION---------#########
+  has n, :interests, :through => Resource
+
+  ##################################################
+  ####### HELPER FUNCTIONS #########################
+  ##################################################
+
+  ######------BEFORE SAVE FUNCTION---------#########
+  #TO DO: FIGURE OUT WHAT'S WRONG WITH THIS
+  before :save do
+     
+  end
+
+  def createCourse(title, description, location, date, totalstudent, coursepic, teacher)
+    self.title = title
+    self.date = date
+    self.description = description
+    self.totstu = totalstudent
+    self.coursepic = coursepic
+    self.created_at = DateTime.now
+    self.location = location
+    add_teacher teacher
+    self.save 
+  end
+
+  #######---------INTERESTS HELPERS----------#######
+  def setInterest(interest)
+    self.interests << interest
+    self.save
+  end
+
+  #TO DO: DELETE INTEREST
+  def deleteInterest(interest)
+
+  end
+
+  ######------COURSES WITHIN 10 DAYS---------#######
   def self.now
       all(:date.gt => DateTime.now, :date.lt => DateTime.now+10)
   end
 
-  def attending(student)
+  ######------STUDENTS IN THE COURSE---------#######
+  def students
+    self.course_person.all(:type => "student").persons
+  end
 
+  ######------TEACHER IN THE COURSE----------#######
+  def teacher
+    self.course_person.first(:type => "teacher").person
+  end
+
+  def teacherName
+    self.course_person.first(:type => "teacher").person.firstname.capitalize + " " + self.course_person.first(:type => "teacher").person.lastname.capitalize
+  end
+
+  def teacherRating
+    self.course_person.first(:type => "teacher").person.curTotRating
+  end
+
+  ######------ADD STUDENT TO COURSE---------########
+  def add_student(person)
+    c = CoursePerson.new type: "student"
+    c.person = person
+    self.course_person << c
+    self.save 
+  end
+
+  ######------DELETE STUDENT FROM COURSE-----#######
+  #TO DO - MAKE DELETION STUFF
+  #def delete_student(person)
+  #  c = CoursePerson.first(:person => person.id)
+  #
+  #end
+
+  ######------ADD TEACHER TO COURSE---------########
+  def add_teacher(person)
+    c = CoursePerson.new type: "teacher"
+    c.person = person
+    self.course_person << c
+  end
+
+  ######------DELETE TEACHER FROM COURSE-----#######
+  #TO DO - MAKE DELETION STUFF - MORE COMPLICATED
+  #MAYBE THIS WOULD DELETE THE COURSE AS WELL
+  #def delete_teacher(person)
+  #  c = CoursePerson.first(:person => person.id)
+  #
+  #end
+
+end
+
+class Comment
+  include DataMapper::Resource
+
+  property :id      , Serial, :key => true
+  property :bodytext, Text,    :required => true
+  property :date    , DateTime,:required => true 
+
+  belongs_to :course
+  belongs_to :person
+
+  def makeComment(bodytext, person, course)
+      self.course = course
+      self.person = person
+      self.bodytext = bodytext
+      self.date = DateTime.now
+      course.comments << self
+      person.comments << self
+      self.save
   end
 
 end
 
+class Message
+  include DataMapper::Resource
+
+  property :id      , Serial , :key => true
+  property :subject , String  , :required => true
+  property :bodytext, Text
+  property :created_at, DateTime
+
+  belongs_to :source, 'Person'
+  belongs_to :target, 'Person'
+
+  #TO DO: I NEED TO FIX THE INBOX
+  def sendMail(sender, receiver)
+    self.source = sender
+    sender.sent << self
+    self.target = receiver
+    receiver.inbox << self
+    self.created_at = 
+    self.save
+  end
+
+end
+
+class Interest
+  include DataMapper::Resource
+
+  property :id       , Serial, :key => true
+  property :keyword  , String
+
+  has n, :topics , :required => false
+  has n, :persons , :through => Resource
+  has n, :courses , :through => Resource
+
+end
+
+class Topic
+  include DataMapper::Resource
+
+  property :keyword   , String,   :key => true, :unique_index => true
+
+  belongs_to :interest
+
+end
+
+
 DataMapper.finalize
+# DataMapper.auto_migrate!
 DataMapper.auto_upgrade!

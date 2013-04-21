@@ -3,6 +3,7 @@ require 'bundler'
 Bundler.require
 require 'bcrypt'
 require 'date'
+require 'dm-serializer/to_json'
 require './database.rb'
 
 set :root, File.dirname(__FILE__)
@@ -79,6 +80,11 @@ def upcomingCoursesFunc
     #    #sortingTheClasses(upcomingClasses)
     #end
 
+end
+
+def getLocation(courses)
+    #this will change to get specific courses
+    return courses = Courses.all
 end
 
 
@@ -324,13 +330,23 @@ end
 get '/courses' do
   
     if session[:email]
-      p = Person.first(:email => session[:email])
-  
-      if p.teacher == true
-          @addcourses = true
-      else 
-          @addcourses = false
-      end
+        p = Person.first(:email => session[:email])
+
+        ###################################
+        #######-----TO DO:---------########
+        #sort out the classes that are too far away
+        @courses = Course.all(:order=>[:date.asc])
+        @nearbyCourses = getLocation(@courses)
+
+        if p.teacher == true
+            @addcourses = true
+        else 
+            @addcourses = false
+        end
+        @page_title = "Courses"
+    else
+        @courses = Course.all(:order=>[:date.asc])
+        @page_title = "Courses"
     end
   
       @courses = Course.all(:order=>[:date.asc])
@@ -346,6 +362,8 @@ get '/courses/:title' do
     @this_course = Course.first(:title => params[:title])
     #raise Exception, @date = @this_course.strftime([format='%A %d %b %Y'])
     @page_title = ":title"
+
+    @count = @courses.count
   
     erb :single_course
 
@@ -366,6 +384,9 @@ post '/newcourse' do
                              :title => params[:title],
                              :description => params[:description],
                              :interest => params[:interest])
+
+        #CoursePerson.create(:person => p, :course => @course, :type => :teacher)
+
         
         if @course.persons << p 
             
@@ -391,6 +412,12 @@ post '/newcourse' do
     end     
 end
 
+get '/enrollclass' do
+
+    refer = "#{env['HTTP_REFERER']}"
+    
+end
+
 get '/logout' do
 
     session[:firstname] = nil
@@ -407,5 +434,27 @@ get '/test_associations' do
 end
 
 get '/test_ajax' do
+    
     @course = Course.all
+
 end
+
+get '/setinterests' do
+    
+    interests = []
+    #######################################---------INTERESTS ALREADY IN THE DATABASE----------------#####################################################
+    # "Arts", "Audio", "Biology & Life Sciences", "Business & Management", "Chemistry", "CS: Artificial Intelligence", "CS: Artificial Intelligence", 
+    #                 "CS: Software Engineering", "CS: Systems & Security", "CS: Theory", "Economics & Finance", "Education", "Energy & Earth Sciences",
+    #                 "Engineering", "Film", "Food and Nutrition", "Health & Society", "Humanities", "Information, Tech, and Design", "Law", "Mathematics", "Medicine",
+    #                 "Music", "Physical & Earth Sciences", "Physics", "Social Sciences", "Statistics and Data Analysis"
+
+
+    interests.each do |interest|
+        dbInterest = Interest.new
+        dbInterest.keyword = interest
+        dbInterest.save
+    end
+    
+end
+
+

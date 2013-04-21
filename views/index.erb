@@ -11,7 +11,15 @@
 	                <% i = 0 %>
 				    <% @classes.each do |course| %>
 
-        			    <li><label class="tree-toggler nav-header"><%= course.title %><div class="pull-right"><%= course.interest %></div></label>
+        			    <li>
+                            <label class="tree-toggler nav-header"><%= course.title %>
+                                <div class="pull-right">
+                                    <% puts course.interests %>
+                                    <% interests = course.interests %>
+                                    <% puts interest = interests[0] %>
+                                    <% puts interest.keyword %>
+                                </div>
+                        </label>
 
         			        <ul class="nav nav-list tree">
                                 <li><%= course.description %></li>
@@ -28,29 +36,7 @@
         	</div>
 	    </div>
     </div>
-</div>
 
-<div id="ajaxExample"></div>
-<button type="button" onclick="loadXMLDoc()">Change Content</button>
-<!-- FIRST AJAX EXAMPLE-->
-<script>
-function loadXMLDoc()
-{
-var xmlhttp;
-var txt,x,i;
-xmlhttp=new XMLHttpRequest();
-  
-xmlhttp.onreadystatechange=function()
-  {
-  if (xmlhttp.readyState==4 && xmlhttp.status==200)
-    {
-    document.getElementById("ajaxExample").innerHTML=xmlhttp.responseText;
-    }
-  }
-xmlhttp.open("GET","/test_ajax",true);
-xmlhttp.send();
-}
-</script>
 
 <!-- THIS RUNS THE CLASSES ON THE RIGHT -->
 <script>
@@ -90,3 +76,5 @@ function initialize() {
 google.maps.event.addDomListener(window, 'load', initialize);
 
 </script>
+
+</div>

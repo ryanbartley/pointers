@@ -7,10 +7,16 @@
 		
 			<a href="/courses/<%= course.title %>" class="link">
 			<div class="span4">
-			<div class="well">
+			<div class="well classes">
 				
 				<h2 class="course-title"><%= course.title %></h2>
-				<p><span class="label"><%= course.interest %></span></p>
+				<p>
+					<% course.interests.each do |interest| %>
+
+						<span class="label"><%= interest.keyword %></span>
+
+					<% end %>
+				</p>
 					<h5>by: <%= course.instructorfirst %> <%=course.instructorlast %></h5>
 					<h5>Location: <%= course.location %></h5>
 					
@@ -21,9 +27,7 @@
 					<div class="span2">
 				<h6><%= course.date.strftime("%A %m/%d/%y") %></h6>
 			</div>
-				<div class="span1 offset1">
-					<h6><%= course.interest %></h6>
-				</div>
+				
 		</div>
 				
 			</div>
