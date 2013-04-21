@@ -4,7 +4,7 @@
 </div>
 
 <div class="hero-unit span7">
-	<div >
+	<div>
 
 		<div>
 			<p>
@@ -12,25 +12,22 @@
 			</p>
 		</div>
 	</div>
-	<div class="hero" >
-		<div>
+	<div class="row">
+	<div class="span3" >
+			<div class="row">
 			<a class="thumbnail">
 				<p style="margin: 0 0 0px;">
-					<img src="http://sphotos-a.xx.fbcdn.net/hphotos-ash3/19194_10152499717805298_1220378007_n.jpg" alt="">
+					<img src="<%= @this_course.coursepic %>" alt="">
 				</p>
 			</a>
 		</div>
-		<div class="hero"> 
-			<i class="icon-user"></i><a href="#"> <%= @this_course.instructorfirst %> <%= @this_course.instructorlast %></a>      
-			<p>
-				<%= @this_course.description %>
-			</p>
+		<div class="row">
+			Seats Remaining: <%= @this_course.totstu %>
+		</div>
+		<div class="row">
 			<p><a class="btn" href="/enrollclass">Join Class</a></p>
 		</div>
-	</div>
-	<div class="row">
-		<div class="span7">
-			<p></p>
+		<div class="row">
 			<p>
 				<i class="icon-tags"></i> Tags :
 
@@ -47,7 +44,22 @@
 			</p>
 		</div>
 	</div>
-</div>
+
+		<div class="span4">
+
+			<i class="icon-user"></i><a href="#"> <%= @this_course.teacherName %> </a>      
+			<p>
+				<%= @this_course.description %>
+			</p>
+		</div>
+		</div>
+	<div class="hero">
+		
+	</div>
+	
+			
+			
+	</div>
 </div>
 
 
@@ -62,7 +74,7 @@
 				<% i = 0 %>
 				<% @courses.each do |course| %>
 
-				<li><label class="tree-toggler nav-header"><%= course.title %><div class="pull-right"><%= course.interests.keyword[0].keyword %></div></label>
+				<li><label class="tree-toggler nav-header"><%= course.title %><div class="pull-right"><!--= course.interests.keyword[0].keyword --></div></label>
 
 					<ul class="nav nav-list tree">
 						<li><%= course.description[0,20] + "..." %></li>

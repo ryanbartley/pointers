@@ -54,13 +54,13 @@ class Person
   #YOU.
   has n, :links_to_followed_people, 
     'Person::Link', 
-    :child_key => [:follower_id],
-    :required => false
+    :child_key => [:follower_id]
+    
 
   has n, :links_to_followers, 
     'Person::Link', 
-    :child_key => [:followed_id],
-    :required => false
+    :child_key => [:followed_id]
+    
 
 
   has n, :followed_people, self,
@@ -77,8 +77,8 @@ class Person
 
   #TO DO - INBOX DOESN'T WORK FOR SOME REASON
   #######------MESSAGE ASSOCIATION------------######
-  has n, :inbox, 'Message', :child_key => [ :target_id ], :order => :date.desc
-  has n, :sent, 'Message', :child_key => [ :source_id ], :order => :date.desc
+  has n, :inbox, 'Message', :child_key => [ :target_id ]#, :order => :date.desc
+  has n, :sent, 'Message', :child_key => [ :source_id ]#, :order => :date.desc
 
   ######-------COMMENTS ASSOCIATION-------##########
   has n, :comments
@@ -99,6 +99,10 @@ class Person
     
   end
 
+  def name
+    self.firstname.capitalize + " " + self.lastname.capitalize
+  end
+
   def createPerson(firstname, lastname, email, password, location, propic)
     self.firstname = firstname
     self.lastname = lastname
@@ -109,6 +113,19 @@ class Person
     created_at = DateTime.now
     lastLogin = created_at
     self.setProfile
+    self.save
+  end
+
+  def createPerson(firstname, lastname, email, password, location)
+    self.firstname = firstname
+    self.lastname = lastname
+    self.email = email.downcase
+    self.password = password
+    self.location = location
+    created_at = DateTime.now
+    lastLogin = created_at
+    self.setProfile
+    self.save
   end
 
   def loginProfile
@@ -128,19 +145,19 @@ class Person
 
   #######---------FOLLOWERS HELPERS----------#######
   def getFollowers
-    followers.count
+    self.followers.count
   end
 
   def getFollowerPeople
-    followers.all 
+    self.followers.all 
   end
 
   def getFollowed
-    followed_people.count
+    self.followed_people.count
   end
 
   def getFollowingPeople
-    followed_people.all 
+    self.followed_people.all 
   end
 
   def follow(others)
@@ -219,7 +236,7 @@ class Course
   property :title           , String,    :required => true
   property :date            , DateTime,  :required => true
   property :created_at      , DateTime   #This should be required.
-  property :totstu          , String
+  property :totstu          , Integer
   property :location        , String    
   property :coursepic       , String,    :length => 255
   property :description     , Text,      :required => true
@@ -350,13 +367,13 @@ end
 class Message
   include DataMapper::Resource
 
-  property :id      , Serial , :key => true
+  property :id      , Serial 
   property :subject , String  , :required => true
   property :bodytext, Text
   property :created_at, DateTime
 
-  belongs_to :source, 'Person'
-  belongs_to :target, 'Person'
+  belongs_to :source, 'Person', :key => true
+  belongs_to :target, 'Person', :key => true
 
   #TO DO: I NEED TO FIX THE INBOX
   def sendMail(sender, receiver)
@@ -364,7 +381,7 @@ class Message
     sender.sent << self
     self.target = receiver
     receiver.inbox << self
-    self.created_at = 
+    self.created_at = DateTime.now
     self.save
   end
 
