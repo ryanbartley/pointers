@@ -19,8 +19,11 @@
                         
                         <label style="">Interests</label>
                         <legend></legend>
-                            <p><%= @p.interest1 %></p>
-                        <span class="badge badge-warning">8 messages</span> <span class="badge badge-info">15 followers</span>
+                            <p>
+                                <!-- TODO: MAKE IT SO THAT THERE CAN BE MORE THAN ONE INTEREST -->
+                                <%= @p.interests.first.keyword %> 
+                            </p>
+                        <span class="badge badge-warning"><%= @p.getInbox.count %> messages</span> <span class="badge badge-info"><%= @p.getFollowers %> followers</span>
                         <div class="control-group" style="margin-top: 10px;">
                             <label class="control-label" ></label>
                             <div class="controls">

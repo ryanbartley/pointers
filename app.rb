@@ -96,13 +96,15 @@ get '/' do
     @page_title = "Pointers*"
   
     @google_map_key = "AIzaSyB-vkhfS6BiwMLzMCrkeAQJpnjxmQn8U4Y"
-    @classes = Course.now
+    @courses = Course.now
 
-    @count = @classes.count
+    @count = @courses.count
 
     erb :index
   
 end
+
+#HERE'S WHERE I AM
 
 get '/about' do
 
@@ -129,43 +131,40 @@ post "/signedup" do
     
     #make sure the passwords match
     if params[:password] == params[:checkpassword]
-
-        #generate the encryption
     
-        #create the session id
-        session[:email] = params[:email]
-        # raise Exception, session[:email]
-        
-
         #create a new person entry
-        @p = Person.new(:firstname => params[:firstname], 
-                          :lastname => params[:lastname], 
-                          :email => params[:email],
-                          :password => params[:password],
-                          :teacher => false)
+        @p = Person.new
 
-        puts @p.valid?
-        # raise @p.inspect
+        if params[:propic] != ""
+            puts "it thinks i have a pic"
+            @p.createPerson(params[:firstname], params[:lastname], params[:email], params[:password], params[:location], params[:propic])
 
-        if @p.save
-            puts "saved"
+            #create the session id
+            session[:email] = @p.email
+            session[:firstname] = @p.firstname
+            session[:lastname] = @p.lastname
+
             @page_title = "Please Choose Classes"
             @page_heading = "Please Enter Your Username And Password!"
             @forgotPassword = ""
             erb :profile
+        
         else
-            puts "did not save"
-            raise Exception, @p.errors.inspect
-        end
-        #p = Person.new
-        #p.email = session[:email]
-        #p.password_salt = password_salt
-        #p.password_hash = password_hash
-        #p.firstname = params[:firstname]
-        #p.lastname = params[:lastname]
-        #p.teacher = false
-        #raise Exception, p.save
-        #p.save
+
+            @p.createPerson(params[:firstname], params[:lastname], params[:email], params[:password], params[:location])
+
+            #create the session id
+            session[:email] = @p.email
+            session[:firstname] = @p.firstname
+            session[:lastname] = @p.lastname
+
+            @page_title = "Please Choose Classes"
+            @page_heading = "Please Enter Your Username And Password!"
+            @forgotPassword = ""
+            erb :profile
+
+        end               
+            
     else 
       @page_title = "Please Retype Your Password"
       @page_heading = "Please retype your password!"
@@ -173,7 +172,7 @@ post "/signedup" do
       erb :signup
     end
   else 
-      @page_title = "Please Check email"
+      @page_title = "Email Already Exists"
       @page_heading = "That email is already in use!"
       @forgotPassword = "Forgot Password?"
       erb :signup
@@ -239,7 +238,7 @@ end
 get '/changeprofile' do
 
     @p = Person.first(:email => session[:email])
-
+    @interests = Interest.all 
     if @p 
         #raise Exception, @p
         @page_title = "Change Your Profile"
@@ -280,15 +279,15 @@ post '/updateprofile' do
                     :password => params[:newpassword],
                     :teacher => params[:group1],
                     :propic => params[:propic], 
-                    :interest1 => params[:interests],
                     :teacher => teach)
-                else
-                    raise Exception, p.errors.inspect
+
+                    interest = Interest.first(:keyword => params[:interests])
+                    p.setInterest(interest)
                 end
             else 
                 @p = p
                 @page_title = "Change Your Profile"
-                @page_heading = "You didn't enter your password correctly!"
+                @page_heading = "You didn't enter your old password correctly!"
                 erb :changeprofile
             end
             
@@ -297,11 +296,11 @@ post '/updateprofile' do
                     :lastname => params[:lastname], 
                     :email => params[:email],
                     :teacher => params[:group1], 
-                    :propic => params[:propic], 
-                    :interest1 => params[:interests],
+                    :propic => params[:propic],
                     :teacher => teach)
-            else
-                raise Exception, p.errors.inspect
+
+                    interest = Interest.first(:keyword => params[:interests])
+                    p.setInterest(interest)
             end
         end
 
@@ -336,7 +335,7 @@ get '/courses' do
         #######-----TO DO:---------########
         #sort out the classes that are too far away
         @courses = Course.all(:order=>[:date.asc])
-        @nearbyCourses = getLocation(@courses)
+        #@nearbyCourses = getLocation(@courses)
 
         if p.teacher == true
             @addcourses = true
@@ -370,47 +369,65 @@ get '/courses/:title' do
 end
 
 post '/newcourse' do
-  
+
     p = Person.first(:email => session[:email])
     
-    if p.teacher == true
-  
+    if p
+        c = Course.new
+
+        c.createCourse(params[:title], params[:description], params[:location], params[:date], params[:totsu], params[:coursepic], p)
         
-      if @course = Course.new(:date => params[:date],
-                             :totstu => params[:totstu],
-                             :location => params[:location],
-                             :instructorfirst => p.firstname,
-                             :instructorlast => p.lastname,
-                             :title => params[:title],
-                             :description => params[:description],
-                             :interest => params[:interest])
-
-        #CoursePerson.create(:person => p, :course => @course, :type => :teacher)
-
-        
-        if @course.persons << p 
-            
-          if p.courses << @course
-
-            if @course.save && p.save
-                redirect "/courses"
-            else
-                raise Exception, "I'm inside"
-                "Your course didn't save." 
-            end
-          else
-            "Your courses didn't setup with the person"
-          end
-        else
-            "It didn't save"
+        if params[:interest]
+            c.setInterest(params[:interest])
+            c.save
         end
-      else
-        raise Exception, course.errors.inspect
-      end
     else
-        "You're not a teacher"
+        "You're not logged in"
     end     
 end
+
+# post '/newcourse' do
+  
+#     p = Person.first(:email => session[:email])
+    
+#     if p.teacher == true
+  
+        
+#       if @course = Course.new(:date => params[:date],
+#                              :totstu => params[:totstu],
+#                              :location => params[:location],
+#                              :instructorfirst => p.firstname,
+#                              :instructorlast => p.lastname,
+#                              :title => params[:title],
+#                              :description => params[:description],
+#                              :interest => params[:interest])
+
+#         #CoursePerson.create(:person => p, :course => @course, :type => :teacher)
+
+        
+#         if @course.persons << p 
+            
+#           if p.courses << @course
+
+#             if @course.save && p.save
+#                 redirect "/courses"
+#             else
+#                 raise Exception, "I'm inside"
+#                 "Your course didn't save." 
+#             end
+#           else
+#             "Your courses didn't setup with the person"
+#           end
+#         else
+#             "It didn't save"
+#         end
+#       else
+#         raise Exception, course.errors.inspect
+#       end
+#     else
+#         "You're not a teacher"
+#     end     
+# end
 
 get '/enrollclass' do
 
@@ -437,5 +454,41 @@ get '/test_ajax' do
     
     @course = Course.all
 
-
 end
+
+get '/setinterests' do
+    
+    interests = []
+    #######################################---------INTERESTS ALREADY IN THE DATABASE----------------#####################################################
+    # "Arts", "Audio", "Biology & Life Sciences", "Business & Management", "Chemistry", "CS: Artificial Intelligence", "CS: Artificial Intelligence", 
+    #                 "CS: Software Engineering", "CS: Systems & Security", "CS: Theory", "Economics & Finance", "Education", "Energy & Earth Sciences",
+    #                 "Engineering", "Film", "Food and Nutrition", "Health & Society", "Humanities", "Information, Tech, and Design", "Law", "Mathematics", "Medicine",
+    #                 "Music", "Physical & Earth Sciences", "Physics", "Social Sciences", "Statistics and Data Analysis"
+
+
+    interests.each do |interest|
+        dbInterest = Interest.new
+        dbInterest.keyword = interest
+        dbInterest.save
+    end
+    
+end
+
+get '/users/:slug' do
+
+    @this_profile = Person.first.profile(:slug => params[:slug])
+    #raise Exception, @date = @this_course.strftime([format='%A %d %b %Y'])
+    @page_title = ":slug"
+
+    p = Person.first(:profile => @this_profile)
+    
+  
+    #erb :single_user
+    puts "you're at users"
+    puts p.name
+end
+
+get '/terms' do
+    "This is where the terms will be. Press the back button to go back"
+end
+

@@ -1,19 +1,30 @@
+
 <div id="frame">
 
 	<legend>COURSES<span style="float:right;"><a href="/addcourse">Add Course</a></span></legend>
 
 <div class="row">
 	<% @courses.each do |course| %>
+
 		
 			<a href="/courses/<%= course.title %>" class="link">
 			<div class="span4">
 			<div class="well classes">
-				
-				<h2 class="course-title"><%= course.title %></h2>
-				<p><span class="label"><%= course.interest %></span></p>
-					<h5>by: <%= course.instructorfirst %> <%=course.instructorlast %></h5>
+				<h3 class="course-title"><%= course.title %></h3>
+				<div class="img">
+				<img src="<%=course.coursepic %>" width='300' />
+				</div>
+				<p>
+					<% course.interests.each do |interest| %>
+
+						<span class="label"><%= interest.keyword %></span>
+
+					<% end %>
+				</p>
+				<div class="teacher">
+					<h5>by: <%= course.teacherName %></h5>
 					<h5>Location: <%= course.location %></h5>
-					
+				</div>
 				<p class="desc"><%= course.description %></p>
 
 
@@ -41,3 +52,18 @@
 	<% end %>
 
 </div>
+
+
+<script>
+
+$(document).ready(function(){
+
+$('.well').mouseover(function(){
+	var tagIndex = $('.well').index(this)
+$('.teacher').eq(tagIndex).css({'background-color': '#cfcfcf' ,'-webkit-transition': 'background 0.15s linear'} )
+}).on('mouseout', function(){
+	var tagIndex = $('.well').index(this)
+$('.teacher').eq(tagIndex).css({'background-color': '#f5f5f5','-webkit-transition': 'background 0s linear'})
+})
+})
+</script>

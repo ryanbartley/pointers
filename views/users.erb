@@ -1,0 +1,49 @@
+<div id="frame">
+
+	<legend>COURSES<span style="float:right;"><a href="/addcourse">Add Course</a></span></legend>
+
+<div class="row">
+	<% @courses.each do |course| %>
+		
+			<a href="/users/<%= person.profile.slug %>" class="link">
+			<div class="span4">
+			<div class="well classes">
+				
+				<h2 class="course-title"><%= course.title %></h2>
+				<p>
+					<% course.interests.each do |interest| %>
+
+						<span class="label"><%= interest.keyword %></span>
+
+					<% end %>
+				</p>
+					<h5>by: <%= course.instructorfirst %> <%=course.instructorlast %></h5>
+					<h5>Location: <%= course.location %></h5>
+					
+				<p class="desc"><%= course.description %></p>
+
+
+				<div class="row">
+					<div class="span2">
+				<h6><%= course.date.strftime("%A %m/%d/%y") %></h6>
+			</div>
+				
+		</div>
+				
+			</div>
+		</div>
+		</a>
+		
+	
+	<% end %>
+	</div>
+
+	<% if @addcourses %>
+
+	<h2>
+		
+	</h2>
+
+	<% end %>
+
+</div>

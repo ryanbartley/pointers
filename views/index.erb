@@ -9,11 +9,18 @@
         	<div class="" style="overflow-y: scroll; overflow-x: hidden;">
         	    <ul class="nav nav-list">
 	                <% i = 0 %>
-				    <% @classes.each do |course| %>
+				    <% @courses.each do |course| %>
 
-        			    <li><label class="tree-toggler nav-header"><%= course.title %><div class="pull-right"><%= course.interest %></div></label>
+        			    <li>
+                            <label class="tree-toggler nav-header"><%= course.title %>
+                                <div class="pull-right">
+                                    <!-- TODO: ADD INDIVIDUAL INTERESTS -->
+                                    INTEREST
+                                </div>
+                        </label>
 
         			        <ul class="nav nav-list tree">
+                                <li><a href="users/<%= course.teacher.profile.slug %>"><%= course.teacherName %></a></li>
                                 <li><%= course.description %></li>
         			            <li><a href="/courses/<%= course.title %>">Read More</a></li>
         			        </ul>
