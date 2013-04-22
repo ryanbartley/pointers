@@ -1,7 +1,13 @@
 
 <div id="frame">
 
-	<legend>COURSES<span style="float:right;"><a href="/addcourse">Add Course</a></span></legend>
+	
+	<legend>COURSES
+		<% if @addcourses %>
+			<span style="float:right;"><a href="/addcourse">Add Course</a></span>
+		<% end %>
+	</legend>
+	
 
 <div class="row">
 	<% @courses.each do |course| %>

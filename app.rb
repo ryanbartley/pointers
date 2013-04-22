@@ -134,10 +134,10 @@ post "/signedup" do
     
         #create a new person entry
         @p = Person.new
-
+        puts params[:propic]
         if params[:propic] != ""
             puts "it thinks i have a pic"
-            @p.createPerson(params[:firstname], params[:lastname], params[:email], params[:password], params[:location], params[:propic])
+            @p.createPersonPic(params[:firstname], params[:lastname], params[:email], params[:password], params[:location], params[:propic])
 
             #create the session id
             session[:email] = @p.email
@@ -280,9 +280,11 @@ post '/updateprofile' do
                     :teacher => params[:group1],
                     :propic => params[:propic], 
                     :teacher => teach)
-
-                    interest = Interest.first(:keyword => params[:interests])
-                    p.setInterest(interest)
+                    
+                    if i = Interest.first(:keyword => params[:interest])
+                        
+                        p.setInterest(i)
+                    end    
                 end
             else 
                 @p = p
@@ -293,15 +295,23 @@ post '/updateprofile' do
             
         else
             if p.update(:firstname => params[:firstname], 
-                    :lastname => params[:lastname], 
-                    :email => params[:email],
-                    :teacher => params[:group1], 
-                    :propic => params[:propic],
-                    :teacher => teach)
-
-                    interest = Interest.first(:keyword => params[:interests])
-                    p.setInterest(interest)
-            end
+                :lastname => params[:lastname], 
+                :email => params[:email],
+                :teacher => params[:group1], 
+                :propic => params[:propic],
+                :teacher => teach)
+                
+                if i = Interest.first(:keyword => params[:interest])
+                    
+                    p.setInterest(i)
+                end
+            else 
+                @p = p
+                @page_title = "Change Your Profile"
+                @page_heading = "You didn't enter your old password correctly!"
+                erb :changeprofile
+            end 
+            
         end
 
         redirect "/profile"
@@ -322,6 +332,7 @@ end
 get '/addcourse' do
   
     @page_title = "Add Course"
+    @interests = Interest.all
     erb :addcourse
   
 end
@@ -342,6 +353,7 @@ get '/courses' do
         else 
             @addcourses = false
         end
+
         @page_title = "Courses"
     else
         @courses = Course.all(:order=>[:date.asc])
@@ -359,10 +371,26 @@ get '/courses/:title' do
 
     @courses = Course.all 
     @this_course = Course.first(:title => params[:title])
-    #raise Exception, @date = @this_course.strftime([format='%A %d %b %Y'])
+    
     @page_title = ":title"
-
+    @p = Person.first(:email => session[:email])
     @count = @courses.count
+    
+    if @this_course.students != nil
+        student = @this_course.students.first(:email => @p.email)
+    end
+
+    if student
+        @aStudent = true
+    else
+        @aStudent = false
+    end
+
+    if @this_course.students 
+        @classCount = (@this_course.totstu - @this_course.students.count)
+    else
+        @classCount = @this_course.totstu
+    end
   
     erb :single_course
 
@@ -373,67 +401,110 @@ post '/newcourse' do
     p = Person.first(:email => session[:email])
     
     if p
-        c = Course.new
 
-        c.createCourse(params[:title], params[:description], params[:location], params[:date], params[:totsu], params[:coursepic], p)
+
+        @this_course = Course.new
+        @courses = Course.all
+
+        @this_course.createCourse(params[:title], params[:description], params[:location], 
+            params[:date], params[:totstu], params[:photo], p, params[:interest])
         
-        if params[:interest]
-            c.setInterest(params[:interest])
-            c.save
-        end
+        @count = @courses.count
+        @classCount = @this_course.totstu
+        
+
+        erb :single_course
     else
         "You're not logged in"
     end     
 end
 
-# post '/newcourse' do
-  
-#     p = Person.first(:email => session[:email])
+get '/leaveclass/:course' do
+    p = Person.first(:email => session[:email])
+    course = Course.first(:title => params[:course])
     
-#     if p.teacher == true
+    puts p.email
+    course.delete_student p
+
+    @this_course = course
+
+    @courses = Course.all
+
+    @count = @courses.count
+    if @this_course.students 
+        @classCount = (@this_course.totstu - @this_course.students.count)
+    else
+        @classCount = @this_course.totstu
+    end
+
+    #maybe redirect instead of this
+    erb :single_course
+
+
+end
+
+get '/enrollclass/:course' do
+
+    @p = Person.first(:email => session[:email])
+    
+    course = Course.first(:title => params[:course])
+    
+
+    student = course.students.first(:email => @p.email)
+    puts student.inspect
+    
+    if !student
+        course.add_student @p
+        @aStudent = true
+    else 
+        @aStudent = true
+    end
+
+    @classCount = course.totstu - course.students.count
+
+    @courses = Course.all 
+    @this_course = course
+
+    @page_title = ":course"
+
+    @count = @courses.count
   
-        
-#       if @course = Course.new(:date => params[:date],
-#                              :totstu => params[:totstu],
-#                              :location => params[:location],
-#                              :instructorfirst => p.firstname,
-#                              :instructorlast => p.lastname,
-#                              :title => params[:title],
-#                              :description => params[:description],
-#                              :interest => params[:interest])
-
-#         #CoursePerson.create(:person => p, :course => @course, :type => :teacher)
-
-        
-#         if @course.persons << p 
-            
-#           if p.courses << @course
-
-#             if @course.save && p.save
-#                 redirect "/courses"
-#             else
-#                 raise Exception, "I'm inside"
-#                 "Your course didn't save." 
-#             end
-#           else
-#             "Your courses didn't setup with the person"
-#           end
-#         else
-#             "It didn't save"
-#         end
-#       else
-#         raise Exception, course.errors.inspect
-#       end
-#     else
-#         "You're not a teacher"
-#     end     
-# end
-
-get '/enrollclass' do
-
-    refer = "#{env['HTTP_REFERER']}"
+    #maybe redirect instead of this
+    erb :single_course
     
 end
+
+get '/enrollclass/:course' do
+
+end
+
+get '/users/:slug' do
+
+    @this_profile = Profile.first(:slug => params[:slug])
+    #raise Exception, @date = @this_course.strftime([format='%A %d %b %Y'])
+    @page_title = ":slug"
+
+    @this_person = Person.get(@this_profile.person_id)
+    @people = Person.all
+    @count = @people.count    
+    puts @this_person.name
+    
+
+    erb :single_user
+    
+    
+end
+
+get '/users' do
+    @persons = Person.all
+
+    erb :users
+end
+
+get '/terms' do
+    "This is where the terms will be. Press the back button to go back"
+end
+
 
 get '/logout' do
 
@@ -458,12 +529,12 @@ end
 
 get '/setinterests' do
     
-    interests = []
+    interests = [
     #######################################---------INTERESTS ALREADY IN THE DATABASE----------------#####################################################
-    # "Arts", "Audio", "Biology & Life Sciences", "Business & Management", "Chemistry", "CS: Artificial Intelligence", "CS: Artificial Intelligence", 
-    #                 "CS: Software Engineering", "CS: Systems & Security", "CS: Theory", "Economics & Finance", "Education", "Energy & Earth Sciences",
-    #                 "Engineering", "Film", "Food and Nutrition", "Health & Society", "Humanities", "Information, Tech, and Design", "Law", "Mathematics", "Medicine",
-    #                 "Music", "Physical & Earth Sciences", "Physics", "Social Sciences", "Statistics and Data Analysis"
+    "Arts", "Audio", "Biology & Life Sciences", "Business & Management", "Chemistry", "CS: Artificial Intelligence", "CS: Artificial Intelligence", 
+                    "CS: Software Engineering", "CS: Systems & Security", "CS: Theory", "Economics & Finance", "Education", "Energy & Earth Sciences",
+                    "Engineering", "Film", "Food and Nutrition", "Health & Society", "Humanities", "Information, Tech, and Design", "Law", "Mathematics", "Medicine",
+                    "Music", "Physical & Earth Sciences", "Physics", "Social Sciences", "Statistics and Data Analysis"]
 
 
     interests.each do |interest|
@@ -474,21 +545,5 @@ get '/setinterests' do
     
 end
 
-get '/users/:slug' do
 
-    @this_profile = Person.first.profile(:slug => params[:slug])
-    #raise Exception, @date = @this_course.strftime([format='%A %d %b %Y'])
-    @page_title = ":slug"
-
-    p = Person.first(:profile => @this_profile)
-    
-  
-    #erb :single_user
-    puts "you're at users"
-    puts p.name
-end
-
-get '/terms' do
-    "This is where the terms will be. Press the back button to go back"
-end
 

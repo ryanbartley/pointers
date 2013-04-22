@@ -1,31 +1,42 @@
+
 <div id="frame">
 
-	<legend>COURSES<span style="float:right;"><a href="/addcourse">Add Course</a></span></legend>
+	
+	<legend>PEOPLE
+		<% if @addpersons %>
+			<span style="float:right;"><a href="/addperson">Add person</a></span>
+		<% end %>
+	</legend>
+	
 
 <div class="row">
-	<% @courses.each do |course| %>
+	<% @persons.each do |person| %>
+
 		
 			<a href="/users/<%= person.profile.slug %>" class="link">
 			<div class="span4">
 			<div class="well classes">
-				
-				<h2 class="course-title"><%= course.title %></h2>
+				<h3 class="course-title"><%= person.name %></h3>
+				<div class="img">
+				<img src="<%=person.propic %>" width='300' />
+				</div>
 				<p>
-					<% course.interests.each do |interest| %>
+					<% person.interests.each do |interest| %>
 
 						<span class="label"><%= interest.keyword %></span>
 
 					<% end %>
 				</p>
-					<h5>by: <%= course.instructorfirst %> <%=course.instructorlast %></h5>
-					<h5>Location: <%= course.location %></h5>
-					
-				<p class="desc"><%= course.description %></p>
+				<div class="teacher">
+					<p class="desc">Rating: <%=person.curTotRating%></p>
+					<h5>Location: <%= person.location %></h5>
+				</div>
+				
 
 
 				<div class="row">
 					<div class="span2">
-				<h6><%= course.date.strftime("%A %m/%d/%y") %></h6>
+				<h6><%= person.created_at.strftime("%A %m/%d/%y") %></h6>
 			</div>
 				
 		</div>
@@ -38,7 +49,7 @@
 	<% end %>
 	</div>
 
-	<% if @addcourses %>
+	<% if @addpersons %>
 
 	<h2>
 		
@@ -47,3 +58,18 @@
 	<% end %>
 
 </div>
+
+
+<script>
+
+$(document).ready(function(){
+
+$('.well').mouseover(function(){
+	var tagIndex = $('.well').index(this)
+$('.teacher').eq(tagIndex).css({'background-color': '#cfcfcf' ,'-webkit-transition': 'background 0.15s linear'} )
+}).on('mouseout', function(){
+	var tagIndex = $('.well').index(this)
+$('.teacher').eq(tagIndex).css({'background-color': '#f5f5f5','-webkit-transition': 'background 0s linear'})
+})
+})
+</script>

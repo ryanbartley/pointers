@@ -39,26 +39,22 @@
       <div class="control-group">
           <label class="control-label" for="date" style="width:100px;">Photo</label>
           <div class="controls" style="margin-left:120px;">
-              <textarea style="width: 210px" rows="6" cols="80" name="photo"></textarea>
+              <textarea style="width: 210px" rows="1" cols="80" name="photo" placeholder="Enter Image URL"></textarea>
           </div>
       </div>
 
       <div class="control-group">
-                <label class="control-label" for="interest" style="width:100px;">Interests</label>
-                <div class="controls" style="margin-left:120px;">
-                    <select id="interest" name="interest" style="width: 210px">
-                        <option value="choose">Choose an interest</option>
-                        <option value="Computers">Computers</option>
-                        <option value="Electronics">Electronics</option>
-                        <option value="Literature">Literature</option>
-                        <option value="Mathematics">Mathematics</option>
-                        <option value="Fabrication">Fabrication</option>
-                        <option value="Biking">Biking</option>
-                        <option value="Science">Science</option>
-                        <option value="Philosophy">Philosophy</option>
-                    </select>
-                </div>
-            </div>
+          <label class="control-label" for="interest" style="width: 100px">Interests</label>
+          <div class="controls" style="margin-left:120px;">
+              <select id="interest" name="interest" style="width: 210px; ">
+                        
+                  <% @interests.each do |interest| %>
+                      <option value="<%= interest.keyword %>"><%= interest.keyword %></option>
+                  <% end %>
+
+              </select>
+          </div>
+      </div>
       
       <div class="form-actions" style="padding-left: 10px;">
                     <button type="submit" class="btn btn-primary">Save changes</button>

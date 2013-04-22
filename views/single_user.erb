@@ -8,7 +8,7 @@
 
 		<div>
 			<p>
-				<legend><a href="#"><%= @this_course.title %></a><span style="float: right;"><i class=""></i> <%= @this_course.date.strftime("%A %m/%d/%y") %></legend>
+				<legend><a href="#"><%= @this_person.name %></a><span style="float: right;"><i class=""></i> <%= @this_person.created_at.strftime("%A %m/%d/%y") %></legend>
 			</p>
 		</div>
 	</div>
@@ -17,28 +17,22 @@
 			<div class="row">
 			<a class="thumbnail">
 				<p style="margin: 0 0 0px;">
-					<img src="<%= @this_course.coursepic %>" alt="">
+					<img src="<%= @this_person.propic %>" alt="">
 				</p>
 			</a>
 		</div>
 		<div class="row">
-				Seats Remaining: <%= @classCount %>
+				
 		</div>
 		<div class="row">
-				<% if @aStudent %> 
-					<p><a href="/leaveclass/<%= @this_course.title %>" class="btn" >Leave Class</a></p>
-				<% elsif @classCount > 0 %>
-					<p><a href="/enrollclass/<%= @this_course.title %>" class="btn" >Join Class</a></p>
-				<% else %>
-					<p>CLASS CLOSED</p>
-				<% end %>
+				
  			
 		</div>
 		<div class="row">
 			<p>
 				<i class="icon-tags"></i> Tags :
 
-				<% @this_course.interests.each do |interest| %>
+				<% @this_person.interests.each do |interest| %>
 					
 					<a href="/interests/<%= interest.keyword %>">
 						<span class="label label-info">
@@ -50,26 +44,19 @@
 				
 			</p>
 			<p>
-				<legend>Students Enrolled</legend>
-				<% students = @this_course.students %>
-				<% students.each do |student| %>
+				<legend>Enrolled Student <span style="float: right;">Enrolled Teacher</span></legend>
+				<% stuClasses = @this_person.getStuClasses %>
+				<% stuClasses.each do |course| %>
 
-					<a href="/users/<%= student.profile.slug %>">
-						<%= student.name %>
+					<a href="/users/<%= course.title %>">
+						<%= course.title %>
 					</a>
 
 				<% end %>
 		</div>
 	</div>
 
-		<div class="span4">
-
-			<i class="icon-user"></i><a href="#"> <%= @this_course.teacherName %> </a>      
-			<p>
-				<%= @this_course.description %>
-			</p>
-		</div>
-	</div>
+		
 	
 			
 			
@@ -86,18 +73,18 @@
 			<ul class="nav nav-list">
 
 				<% i = 0 %>
-				<% @courses.each do |course| %>
+				<% @people.each do |person| %>
 					
-					<li><label class="tree-toggler nav-header"><%= course.title %>
-						<% if course.interests[0] != nil  %>
-							<div class="pull-right"><%= course.interests[0].keyword %></div>
+					<li><label class="tree-toggler nav-header"><%= person.name %>
+						<% if person.interests[0] != nil  %>
+							<div class="pull-right"><%= person.interests[0].keyword %></div>
 						<% end %>
 					</label></li>
 
 
 					<ul class="nav nav-list tree">
-						<li><%= course.description[0,20] + "..." %></li>
-						<li><a href="/courses/<%= course.title %>">Read More</a></li>
+						<li></li>
+						<li><a href="/user/<%= person.profile.slug %>">Read More</a></li>
 					</ul>
 				</li>
 				<% i+=1 %>

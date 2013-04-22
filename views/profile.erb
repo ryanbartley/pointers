@@ -19,10 +19,15 @@
                         
                         <label style="">Interests</label>
                         <legend></legend>
-                            <p>
-                                <!-- TODO: MAKE IT SO THAT THERE CAN BE MORE THAN ONE INTEREST -->
-                                <%= @p.interests.first.keyword %> 
-                            </p>
+                            <% if @p.interests.first %>
+                                <% @p.interests.each do |interest| %>
+                                    <p>
+                                        <!-- TODO: MAKE IT SO THAT THERE CAN BE MORE THAN ONE INTEREST -->
+        
+                                        <%= interest.keyword %> 
+                                    </p>
+                                <% end %>
+                            <% end %>
                         <span class="badge badge-warning"><%= @p.getInbox.count %> messages</span> <span class="badge badge-info"><%= @p.getFollowers %> followers</span>
                         <div class="control-group" style="margin-top: 10px;">
                             <label class="control-label" ></label>
