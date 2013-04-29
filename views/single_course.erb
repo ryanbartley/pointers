@@ -25,6 +25,7 @@
 				Seats Remaining: <%= @classCount %>
 		</div>
 		<div class="row">
+			
 				<% if @aStudent %> 
 					<p><a href="/leaveclass/<%= @this_course.title %>" class="btn" >Leave Class</a></p>
 				<% elsif @classCount > 0 %>
@@ -32,8 +33,16 @@
 				<% else %>
 					<p>CLASS CLOSED</p>
 				<% end %>
- 			
-		</div>
+		
+			<div class="pull-right">
+				<!-- JOIN LIVE CLASS BUTTON -->
+				<% if @aStudent %> 
+          			<p><a href="/livecourse/<%= @this_course.title %>" class="btn" >Join Live Class</a></p>
+        		<% end %>
+        	</div>
+
+ 		</div>	
+		
 		<div class="row">
 			<p>
 				<i class="icon-tags"></i> Tags :

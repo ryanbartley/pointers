@@ -1,0 +1,47 @@
+  <body>
+
+   <div class="container">
+
+      <div class="topbar">
+        <div class="fill">
+          <div class="container">
+            
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-unit">
+        <h1>GrandIo Chat</h1>
+        
+      </div>
+      
+      <section class="realtime-chat">
+        
+        <div class="row">
+          
+          <div class="span5" id='pusher_chat_widget'>
+          </div>
+          
+        </div>
+        
+      </section>
+
+      <footer>
+        <p></p>
+      </footer>
+
+    </div> <!-- /container -->
+
+    <script>
+      $(function() {     
+        var pusher = new Pusher('49e26cb8e9dde3dfc009')
+        var chatWidget = new PusherChatWidget(pusher, {
+          chatEndPoint: 'http://itp.nyu.edu/~rtb288/sinatra/grandio/pusher-realtime-chat-widget/src/ruby-sinatra/chat.rb'
+        });
+      });
+    </script>
+
+    
+
+  </body>
+</html>

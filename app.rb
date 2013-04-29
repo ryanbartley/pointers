@@ -4,9 +4,19 @@ Bundler.require
 require 'bcrypt'
 require 'date'
 require 'dm-serializer/to_json'
+require 'pusher'
 require './database.rb'
 
 set :root, File.dirname(__FILE__)
+
+require_relative 'activity'
+
+############################
+#-------PUSHER KEY---------#
+############################
+Pusher.app_id = '42831'
+Pusher.key = 'b0753433dcd3172ef750'
+Pusher.secret = '10038631598936f297a4'
 
 # Sessions for the temp cookie
 enable :sessions
@@ -419,27 +429,18 @@ post '/newcourse' do
     end     
 end
 
-get '/leaveclass/:course' do
-    p = Person.first(:email => session[:email])
-    course = Course.first(:title => params[:course])
-    
-    puts p.email
-    course.delete_student p
+get '/livecourse/:course' do
 
+    @p = Person.first(:email => session[:email])
+    
+    course = Course.first(:title => params[:course])
+
+    @courses = Course.all 
     @this_course = course
 
-    @courses = Course.all
+    @page_title = @this_course.title.capitalize
 
-    @count = @courses.count
-    if @this_course.students 
-        @classCount = (@this_course.totstu - @this_course.students.count)
-    else
-        @classCount = @this_course.totstu
-    end
-
-    #maybe redirect instead of this
-    erb :single_course
-
+    erb :livecourse
 
 end
 
@@ -469,12 +470,33 @@ get '/enrollclass/:course' do
 
     @count = @courses.count
   
-    #maybe redirect instead of this
+    #TODO - maybe redirect instead of this
     erb :single_course
     
 end
 
-get '/enrollclass/:course' do
+get '/leaveclass/:course' do
+
+    p = Person.first(:email => session[:email])
+    course = Course.first(:title => params[:course])
+    
+    puts p.email
+    course.delete_student p
+
+    @this_course = course
+
+    @courses = Course.all
+
+    @count = @courses.count
+    if @this_course.students 
+        @classCount = (@this_course.totstu - @this_course.students.count)
+    else
+        @classCount = @this_course.totstu
+    end
+
+    #TODO - maybe redirect instead of this
+    erb :single_course
+
 
 end
 
@@ -545,5 +567,57 @@ get '/setinterests' do
     
 end
 
+post '/chat' do
 
+    p = Person.first(:email => session[:email])
+
+    chat_info = params[:chat_info]
+
+    channel_name = nil
+
+    if( !chat_info )
+      status 400
+      puts 'chat_info must be provided'
+    end
+
+    if( !request.referer )
+      status 400
+      puts 'channel name could not be determined from request.referer'
+    end
+
+    channel_name = get_channel_name(request.referer)
+    options = sanitise_input(chat_info)
+
+    activity = Activity.new('chat-message', options['text'], options)
+
+    data = activity.getMessage()
+
+    response = Pusher[channel_name].trigger('chat_message', data)
+
+    result = {'activity' => data, 'pusherResponse' => response}
+
+    status 200
+    headers \
+      'Cache-Control' =>  'no-cache, must-revalidate',
+      'Content-Type' =>  'application/json'
+    
+    body result.to_json
+end
+
+def get_channel_name(http_referer)
+    pattern = /(\W)+/
+    channel_name = http_referer.gsub pattern, '-'
+    return channel_name
+end
+
+def sanitise_input(chat_info)
+    email = chat_info['email']?chat_info['email']:''
+    
+    options = {}
+    options['displayName'] = escape_html(chat_info['nickname']).slice(0, 30)
+    options['text'] = escape_html(chat_info['text']).slice(0, 300)
+    options['email'] = escape_html(email).slice(0, 100)
+    options['get_gravatar'] = true
+    return options
+end
 
