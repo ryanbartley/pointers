@@ -28,17 +28,17 @@
 			
 				<% if @aStudent %> 
 					<p><a href="/leaveclass/<%= @this_course.title %>" class="btn" >Leave Class</a></p>
-				<% elsif @classCount > 0 && !@aTeacher %>
+				<% elsif @classCount > 0  %>
 					<p><a href="/enrollclass/<%= @this_course.title %>" class="btn" >Join Class</a></p>
-				<% elsif @classCount <= 0 && !@aTeacher %>
+				<% elsif @classCount <= 0  %>
 					<p>CLASS CLOSED</p>
 				<% else %>
-					
+
 				<% end %>
 		
 			<div class="pull-right">
 				<!-- JOIN LIVE CLASS BUTTON -->
-				<% if @aStudent || @aTeacher %> 
+				<% if @aStudent %> 
           			<p><a href="/livecourse/<%= @this_course.title %>" class="btn" >Join Live Class</a></p>
         		<% end %>
         	</div>

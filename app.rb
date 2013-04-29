@@ -390,16 +390,11 @@ get '/courses/:title' do
         student = @this_course.students.first(:email => @p.email)
     end
 
-    teacher = @this_course.teacher.first(:email => @p.email)
+    
 
     if student
         @aStudent = true
-        @aTeacher = false
-    elsif teacher
-        @aTeacher = true
-        @aStudent = false
     else 
-        @aTeacher = false
         @aStudent = false
     end
 
