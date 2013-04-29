@@ -14,6 +14,7 @@ gem 'uuid'
 # database stored in a file. It's easy to set up and just fine for most
 # development situations.
 group :development do
+  gem 'dm-postgres-adapter'
   #gem 'dm-sqlite-adapter'
   #gem 'shotgun'
 end
