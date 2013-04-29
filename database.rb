@@ -299,7 +299,7 @@ class Course
 
   ######------COURSES WITHIN 10 DAYS---------#######
   def self.now
-      all(:date.gt => DateTime.now, :date.lt => DateTime.now+10)
+      all(:date.gt => DateTime.now-1, :date.lt => DateTime.now+10)
   end
 
   ######------STUDENTS IN THE COURSE---------#######
