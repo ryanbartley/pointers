@@ -1,7 +1,12 @@
 source 'https://rubygems.org'
 
+ruby '1.9.3'
 gem 'sinatra'
 gem 'data_mapper'
+
+#pusher dependencies
+gem 'pusher'
+gem 'uuid'
 
 #find out from Rune about this
 # disable :protection
@@ -10,6 +15,7 @@ gem 'data_mapper'
 # database stored in a file. It's easy to set up and just fine for most
 # development situations.
 group :development do
+  #gem 'dm-postgres-adapter'
   gem 'dm-sqlite-adapter'
   gem 'shotgun'
 end

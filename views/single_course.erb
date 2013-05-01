@@ -22,18 +22,36 @@
 			</a>
 		</div>
 		<div class="row">
-			Seats Remaining: <%= @this_course.totstu %>
+				Seats Remaining: <%= @classCount %>
 		</div>
 		<div class="row">
-			<p><a class="btn" href="/enrollclass">Join Class</a></p>
-		</div>
+			
+				<% if @aStudent %> 
+					<p><a href="/leaveclass/<%= @this_course.title %>" class="btn" >Leave Class</a></p>
+				<% elsif @classCount > 0  %>
+					<p><a href="/enrollclass/<%= @this_course.title %>" class="btn" >Join Class</a></p>
+				<% elsif @classCount <= 0  %>
+					<p>CLASS CLOSED</p>
+				<% else %>
+
+				<% end %>
+		
+			<div class="pull-right">
+				<!-- JOIN LIVE CLASS BUTTON -->
+				<% if @aStudent %> 
+          			<p><a href="/livecourse/<%= @this_course.title %>" class="btn" >Join Live Class</a></p>
+        		<% end %>
+        	</div>
+
+ 		</div>	
+		
 		<div class="row">
 			<p>
 				<i class="icon-tags"></i> Tags :
 
 				<% @this_course.interests.each do |interest| %>
 					
-					<a href="/interests/<%= interests.keyword %>">
+					<a href="/interests/<%= interest.keyword %>">
 						<span class="label label-info">
 							<%= interest.keyword %>
 						</span>
@@ -42,6 +60,16 @@
 				<% end %>
 				
 			</p>
+			<p>
+				<legend>Students Enrolled</legend>
+				<% students = @this_course.students %>
+				<% students.each do |student| %>
+
+					<a href="/users/<%= student.profile.slug %>">
+						<%= student.name %>
+					</a>
+
+				<% end %>
 		</div>
 	</div>
 
@@ -52,9 +80,6 @@
 				<%= @this_course.description %>
 			</p>
 		</div>
-		</div>
-	<div class="hero">
-		
 	</div>
 	
 			
@@ -73,8 +98,13 @@
 
 				<% i = 0 %>
 				<% @courses.each do |course| %>
+					
+					<li><label class="tree-toggler nav-header"><%= course.title %>
+						<% if course.interests[0] != nil  %>
+							<div class="pull-right"><%= course.interests[0].keyword %></div>
+						<% end %>
+					</label></li>
 
-				<li><label class="tree-toggler nav-header"><%= course.title %><div class="pull-right"><!--= course.interests.keyword[0].keyword --></div></label>
 
 					<ul class="nav nav-list tree">
 						<li><%= course.description[0,20] + "..." %></li>

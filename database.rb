@@ -103,7 +103,7 @@ class Person
     self.firstname.capitalize + " " + self.lastname.capitalize
   end
 
-  def createPerson(firstname, lastname, email, password, location, propic)
+  def createPersonPic(firstname, lastname, email, password, location, propic)
     self.firstname = firstname
     self.lastname = lastname
     self.email = email.downcase
@@ -179,7 +179,11 @@ class Person
   end
 
   def curTotRating
-    (self.totalrating / self.totalrated)
+    if self.totalrated > 0
+      (self.totalrating / self.totalrated)
+    else
+      0
+    end
   end
 
   #######--------MESSAGE FUNCTIONS-----------########
@@ -194,7 +198,7 @@ class Person
 
   ########-------COURSE FUNCTIONS------------########
   def getStuClasses
-    self.course_person.all(:type => "student").course
+    self.course_person.all(:type => "student").courses
   end
 
   def getTeachClasses
@@ -264,22 +268,28 @@ class Course
      
   end
 
-  def createCourse(title, description, location, date, totalstudent, coursepic, teacher)
+  def createCourse(title, description, location, date, totalstudent, coursepic, teacher, interest)
+    puts totalstudent 
     self.title = title
     self.date = date
     self.description = description
-    self.totstu = totalstudent
+    self.totstu = totalstudent.to_i
     self.coursepic = coursepic
     self.created_at = DateTime.now
     self.location = location
     add_teacher teacher
+    self.setInterest interest
+
     self.save 
   end
 
   #######---------INTERESTS HELPERS----------#######
   def setInterest(interest)
-    self.interests << interest
-    self.save
+    if interest != nil
+      i = Interest.first(:keyword => interest)
+      self.interests << i
+      self.save
+    end
   end
 
   #TO DO: DELETE INTEREST
@@ -289,7 +299,7 @@ class Course
 
   ######------COURSES WITHIN 10 DAYS---------#######
   def self.now
-      all(:date.gt => DateTime.now, :date.lt => DateTime.now+10)
+      all(:date.gt => DateTime.now-1, :date.lt => DateTime.now+10)
   end
 
   ######------STUDENTS IN THE COURSE---------#######
@@ -320,10 +330,16 @@ class Course
 
   ######------DELETE STUDENT FROM COURSE-----#######
   #TO DO - MAKE DELETION STUFF
-  #def delete_student(person)
-  #  c = CoursePerson.first(:person => person.id)
-  #
-  #end
+  def delete_student(person)
+    c = CoursePerson.first(:person_id => person.id, :course_id => self.id)
+    # puts c.inspect
+    if c 
+      c.destroy!
+      self.save
+    else
+      puts "wasn't a member"
+    end 
+  end
 
   ######------ADD TEACHER TO COURSE---------########
   def add_teacher(person)

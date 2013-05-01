@@ -1,0 +1,51 @@
+
+<title>Standing Desk</title>   
+
+<div class="hero-unit span10">
+  <div>
+
+    <div>
+      <p>
+        <legend><a href="#"><%= @this_course.title %></a> LIVE<span style="float: right;"><i class=""></i> <%= @this_course.date.strftime("%A %m/%d/%y") %></legend>
+      </p>
+    </div>
+  </div>
+  <div class="span5" >
+    
+    <div class="row">
+      <a class="thumbnail">
+        <p style="margin: 0 0 0px;">
+           <!-- This is where the ustream goes -->
+           <iframe width="480" height="302" src="http://www.ustream.tv/embed/14209997?v=3&amp;wmode=direct" scrolling="no" frameborder="0" style="border: 0px none transparent;">    </iframe>
+        </p>
+      </a>
+      <p>
+        <i class="icon-user"></i><a href="<%= @this_course.teacher.profile.slug %>"> <%= @this_course.teacherName %> </a> 
+      </p>
+    </div>
+    
+  </div>
+                <!-- THE PUSHER WIDGET -->
+    <div class="span4 pull-right" id='pusher_chat_widget'>
+    </div> 
+      
+
+    
+  </div>
+  <div id="chatpageuser" name="<%= @p.name %>" profile="<%= @p.profile.slug %>" picture="<%= @p.propic %>" email="<%= @p.email %>"></div>
+
+      
+  </div>
+</div>  
+
+<!-- THIS RUNS THE CLASSES ON THE RIGHT AND CREATES PUSHER -->
+<script>
+$(function() {     
+        var pusher = new Pusher('42831')
+        var chatWidget = new PusherChatWidget(pusher, {
+          appendTo: '#pusher_chat_widget',
+          chatEndPoint: '/chat'
+        });
+      });
+</script>
+

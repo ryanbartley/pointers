@@ -1,0 +1,110 @@
+<div id="frame">
+	
+	
+</div>
+
+<div class="hero-unit span7">
+	<div>
+
+		<div>
+			<p>
+				<legend><a href="#"><%= @this_person.name %></a><span style="float: right;"><i class=""></i> <%= @this_person.created_at.strftime("%A %m/%d/%y") %></legend>
+			</p>
+		</div>
+	</div>
+	<div class="row">
+	<div class="span3" >
+			<div class="row">
+			<a class="thumbnail">
+				<p style="margin: 0 0 0px;">
+					<img src="<%= @this_person.propic %>" alt="">
+				</p>
+			</a>
+		</div>
+		<div class="row">
+				
+		</div>
+		<div class="row">
+				
+ 			
+		</div>
+		<div class="row">
+			<p>
+				<i class="icon-tags"></i> Tags :
+
+				<% @this_person.interests.each do |interest| %>
+					
+					<a href="/interests/<%= interest.keyword %>">
+						<span class="label label-info">
+							<%= interest.keyword %>
+						</span>
+					</a>
+
+				<% end %>
+				
+			</p>
+			<p>
+				<legend>Enrolled Student <span style="float: right;">Enrolled Teacher</span></legend>
+				<% stuClasses = @this_person.getStuClasses %>
+				<% stuClasses.each do |course| %>
+
+					<a href="/users/<%= course.title %>">
+						<%= course.title %>
+					</a>
+
+				<% end %>
+		</div>
+	</div>
+
+		
+	
+			
+			
+	</div>
+</div>
+
+
+<!-- TO DO: change the class of course so that there can be a more unique way of identifying this class from other classes, preferably with a unique id instead of title. -->
+<div class="span3" style="float:right; margin-left: 5px;">
+	<legend>What Else?</legend>
+	<div class="well indexCourses" style=" padding: 8px 0; ">
+
+		<div class="" style="overflow-y: scroll; overflow-x: hidden;">
+			<ul class="nav nav-list">
+
+				<% i = 0 %>
+				<% @people.each do |person| %>
+					
+					<li><label class="tree-toggler nav-header"><%= person.name %>
+						<% if person.interests[0] != nil  %>
+							<div class="pull-right"><%= person.interests[0].keyword %></div>
+						<% end %>
+					</label></li>
+
+
+					<ul class="nav nav-list tree">
+						<li></li>
+						<li><a href="/user/<%= person.profile.slug %>">Read More</a></li>
+					</ul>
+				</li>
+				<% i+=1 %>
+				<% if i < @count %> 
+				<li class="divider"></li>
+				<% end %>
+				<% end %>
+
+			</ul>
+		</div>
+	</div>
+</div>
+
+<!-- THIS RUNS THE CLASSES ON THE RIGHT -->
+<script>
+$(document).ready(function () {
+	$('ul.tree').toggle(300);
+
+	$('label.tree-toggler').click(function () {
+		$(this).parent().children('ul.tree').toggle(300);
+	});
+});
+</script>
