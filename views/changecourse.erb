@@ -1,0 +1,113 @@
+<div>
+  <legend>ADD A COURSE</legend>
+
+  <form class="form-horizontal" id="addproject" action="/updatecourse" method="post">
+      <div class="control-group">
+          <label class="control-label" for="title" style="width:100px;">Title</label>
+          <div class="controls" style="margin-left:120px;">
+              <input class="input-large" id="title" type="text" name="title" value="<%= @this_course.title %>" />
+          </div>
+      </div>
+    
+      <div class="control-group">
+          <label class="control-label" for="date" style="width:100px;">Date</label>
+          <div class="controls" style="margin-left:120px;">
+              <input class="input-large" id="date" type="date" name="date" value="<%= @this_course.date.strftime('%Y-%m-%d') %>" />
+          </div>
+      </div>
+
+      <!-- This is to decide whether it's am or pm TODO: MAKE JUST THE BUTTON ACTIVATION THE CHANGE-->
+      
+          <div class="control-group">
+              <label class="control-label" for="time" style="width:100px;">Time</label>
+              <div class="controls" style="margin-left:120px;">
+                  <input class="input-mini" style="text-align:right; width:50px" id="time" type="time" name="hour" value="<%= @this_course.date.strftime('%l') %>" />
+                  :
+                  <input class="input-mini" style="width:50px"id="time" type="time" name="minute" value="<%= @this_course.date.strftime('%M') %>" />
+                  <input type="hidden" name="daynight" value="" id="btn-input" />
+                  <div class="btn-group" data-toggle="buttons-radio">  
+                      <button id="btn-one" style="padding: 3px 12px; margin-bottom: -5px"type="button" data-toggle="button" name="am" value="am" class="btn btn-primary">AM</button>
+                      <button id="btn-two" style="padding: 3px 12px; margin-bottom: -5px"type="button" data-toggle="button" name="pm" value="pm" class="btn btn-primary">PM</button>
+                  </div>
+              </div>
+          </div>
+      
+      
+
+      <div class="control-group">
+          <label class="control-label" for="totstu" style="width:100px;">Total Students</label>
+          <div class="controls" style="margin-left:120px;">
+              <input class="input-large" id="totstu" type="text" name="totstu" value="<%= @this_course.totstu %>" />
+          </div>
+      </div>
+
+      <div class="control-group">
+          <label class="control-label" for="location" style="width:100px;">Location</label>
+          <div class="controls" style="margin-left:120px;">
+              <input class="input-large" id="location" type="text" name="location" value="<%= @this_course.location %>" />
+          </div>
+      </div>
+     
+      <div class="control-group">
+          <label class="control-label" for="date" style="width:100px;">Description</label>
+          <div class="controls" style="margin-left:120px;">
+              <textarea style="width: 210px" rows="6" cols="80" name="description" value=""><%= @this_course.description %></textarea>
+          </div>
+      </div>
+
+      <div class="control-group">
+          <label class="control-label" for="date" style="width:100px;">Photo</label>
+          <div class="controls" style="margin-left:120px;">
+              <textarea style="width: 210px" rows="1" cols="80" name="photo" value="" placeholder="Enter Image URL"><%= @this_course.coursepic %></textarea>
+          </div>
+      </div>
+
+      <div class="control-group">
+          <label class="control-label" for="interest" style="width: 100px">Interests</label>
+          <div class="controls" style="margin-left:120px;">
+              <select id="interest" name="interest" style="width: 210px; ">
+                        
+                  <% @interests.each do |interest| %>
+                      <option value="<%= interest.keyword %>"><%= interest.keyword %></option>
+                  <% end %>
+
+              </select>
+          </div>
+      </div>
+      
+      <input type="hidden" name="coursetitle" value="<%= @this_course.title %>" id="title" />
+
+      <div class="form-actions" style="padding-left: 10px;">
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                    <a type="button" class="btn" href="/courses">Cancel</a>
+                </div> 
+            </div>
+    </div>
+  </form>
+</div>
+
+<script>
+    var btns = ['btn-one', 'btn-two'];
+    var input = document.getElementById('btn-input');
+    var hour = <%= @this_course.date.strftime('%H').to_i %>
+    $(document).ready(function(){
+        if (hour > 12) {
+            $('#btn-two').addClass('active');
+            button = $('#btn-input');
+            button[0].value = $('#btn-two')[0].value;
+        } else {
+            $('btn-one').addClass('active');
+            button = $('#btn-input');
+            button[0].value = $('#btn-one')[0].value;
+        }
+
+    });
+    
+    
+    for(var i = 0; i < btns.length; i++) {
+        document.getElementById(btns[i]).addEventListener('click', function() {
+            input.value = this.value;
+        });
+    }
+</script>
+

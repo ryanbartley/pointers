@@ -1,0 +1,181 @@
+  <script>
+    $(document).ready(function () {
+        $('ul.tree').toggle(300);
+
+        $('label.tree-toggler').click(function () {
+            $(this).parent().children('ul.tree').toggle(300);
+        });
+    });
+</script>  
+
+     <!--Hidden Modal for compose -->
+                  <div class="modal hide" id="myModal">
+                  <form class="well span6" method=POST action="/new_message">
+                  <div class="row">
+                  <div class="span3">
+                  <label>To:</label>
+                  <input type="text" class="span3" name="receiver" placeholder="">
+                  </div>
+                  <div class="span3">
+                  <label>Subject</label>
+                  <input type="text" class="span3" name="subject" placeholder="Subject">
+                  </div>
+                  </div>
+                  <div class="row">
+                  <div class="span5">
+                  <label>Message</label>
+                  <textarea name="message" id="message" class="input-xlarge span5" rows="10"></textarea>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="span1 offset5">
+                  <button type="submit" class="btn btn-primary pull-right">Send</button>
+                  </div>
+                </div>
+                  </form>
+                  </div>
+                </div>
+
+   
+
+        <div class="" id="loginModal">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3>Messages</h3>
+          </div>
+          <div class="modal-body">
+            <div class="well">
+              <ul class="nav nav-tabs">
+                <li class="active"><a href="#login" data-toggle="tab">Inbox</a></li>
+                <li><a href="#create" data-toggle="tab">Sent</a></li>
+              </ul>
+              <div id="myTabContent" class="tab-content">
+                <div class="tab-pane active in" id="login">
+                  <% @p.getInbox.each do |message| %>
+                  
+
+
+                  <!-- Inbox -->  
+                  <table class="table table-condensed table-hover">
+                       <thead>
+                      <tr>
+                        <th class="span1"><input type="checkbox"></th>
+                        <th class="span2"></th>
+                        <th class="span2"></th>
+                        <th class="span9"></th>
+                        <th class="span2"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+
+                        <td><input type="checkbox"> <a href="#"><i class="icon-star-empty"></i></a></td>
+                        <td><strong><%= Person.first(:id => message.source_id).name %></strong></td>
+                        <td><span class="label pull-right">Notifications</span></td>
+                        <td><strong>
+
+
+
+                          <div class="" style="overflow-y: scroll; overflow-x: hidden;">
+                          <ul class="nav nav-list">
+                          <% i = 0 %>
+            
+
+                          <li>
+                            <label class="tree-toggler nav-header"><%= message.subject %>
+                                
+                           </label>
+
+                      <ul class="nav nav-list tree">
+
+                                <li><%= message.bodytext %></li>
+                                <a class="btn btn-primary" data-toggle="modal" href="#myModal" >Reply</a>
+                      </ul>
+                  </li>
+                        <% i+=1 %>
+                        <% if i < @count %> 
+                      <li class="divider"></li>
+
+
+
+
+
+                        <% end %>
+            
+
+                      </ul>
+                     </div>
+
+
+
+                          </strong></td>
+                        <td><strong><%= message.created_at.strftime("%m/%d/%y") %></strong></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <% end %>
+                </div>
+
+
+
+                <!--Sent Mail-->
+                <div class="tab-pane fade" id="create">
+                  <% @p.getSent.each do |message| %>
+                  <table class="table table-condensed table-hover">
+  <thead>
+    <tr>
+      <th class="span1"><input type="checkbox"></th>
+      <th class="span2"></th>
+      <th class="span2"></th>
+      <th class="span9"></th>
+      <th class="span2"></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><input type="checkbox"> <a href="#"><i class="icon-star-empty"></i></a></td>
+      <td><strong><%= Person.first(:id => message.target_id).name %></strong></td>
+      <td><span class="label pull-right">Notifications</span></td>
+      <td><strong>
+        <div class="" style="overflow-y: scroll; overflow-x: hidden;">
+                          <ul class="nav nav-list">
+                          <% i = 0 %>
+            
+
+                          <li>
+                            <label class="tree-toggler nav-header"><%= message.subject %>
+                                
+                           </label>
+
+                      <ul class="nav nav-list tree">
+
+                                <li><%= message.bodytext %></li>
+                      </ul>
+                  </li>
+                        <% i+=1 %>
+                        <% if i < @sentCount %> 
+                      <li class="divider"></li>
+                        <% end %>
+            
+
+                      </ul>
+                     </div>
+
+
+
+      </strong></td>
+      <td><strong><%= message.created_at.strftime("%m/%d/%y") %></strong></td>
+    </tr>
+    
+  </tbody>
+</table>
+<% end %>
+                </div>
+
+
+                
+            </div>
+          </div>
+        </div>
+
+

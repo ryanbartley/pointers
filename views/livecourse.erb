@@ -1,5 +1,5 @@
 
-<title>Standing Desk</title>   
+<title><%= @page_title %></title>   
 
 <div class="hero-unit span10">
   <div>
@@ -41,10 +41,13 @@
 <!-- THIS RUNS THE CLASSES ON THE RIGHT AND CREATES PUSHER -->
 <script>
 $(function() {     
-        var pusher = new Pusher('42831')
+        var pusher = new Pusher('d7de9fa48c3e423f3218')
         var chatWidget = new PusherChatWidget(pusher, {
           appendTo: '#pusher_chat_widget',
-          chatEndPoint: '/chat'
+          chatEndPoint: '/chat',
+          channelName: '<%= @this_course.createChannelName %>',
+          courseid: <%= @this_course.id %>,
+          user: <%= @p.safeInfo %> 
         });
       });
 </script>

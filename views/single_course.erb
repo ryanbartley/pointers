@@ -1,7 +1,3 @@
-<div id="frame">
-	
-	
-</div>
 
 <div class="hero-unit span7">
 	<div>
@@ -25,16 +21,23 @@
 				Seats Remaining: <%= @classCount %>
 		</div>
 		<div class="row">
-			
+			<% if !@aTeacher %>
 				<% if @aStudent %> 
 					<p><a href="/leaveclass/<%= @this_course.title %>" class="btn" >Leave Class</a></p>
 				<% elsif @classCount > 0  %>
 					<p><a href="/enrollclass/<%= @this_course.title %>" class="btn" >Join Class</a></p>
 				<% elsif @classCount <= 0  %>
 					<p>CLASS CLOSED</p>
-				<% else %>
+				<% elsif @browser %>
 
 				<% end %>
+			<% elsif @aTeacher %>
+				<p><a href="/editcourse/<%= @this_course.title %>" class="btn" >Edit Class</a></p>
+				<p><a href="/startclass/<%= @this_course.title %>" id="startclass" class="btn" >Start Class</a></p>
+				<% if @this_course.classStart %>
+					<p><a href="/startclass/<%= @this_course.title %>" id="startclass" class="btn" >Start Class</a></p>
+				<% end %>
+			<% end %>
 		
 			<div class="pull-right">
 				<!-- JOIN LIVE CLASS BUTTON -->
@@ -125,10 +128,14 @@
 <!-- THIS RUNS THE CLASSES ON THE RIGHT -->
 <script>
 $(document).ready(function () {
-	$('ul.tree').toggle(300);
+	$('ul.tree').toggle(0);
 
 	$('label.tree-toggler').click(function () {
 		$(this).parent().children('ul.tree').toggle(300);
 	});
 });
+
+$("#startclass").click(function(){
+	alert("are you sure you want to start it?");
+})
 </script>

@@ -11,7 +11,21 @@
       <div class="control-group">
           <label class="control-label" for="date" style="width:100px;">Date</label>
           <div class="controls" style="margin-left:120px;">
-              <input class="input-large" id="date" type="date" name="date" value="" />
+              <input class="input-large" id="date" type="date" name="date" value="" autocomplete="off" />
+          </div>
+      </div>
+
+      <div class="control-group">
+          <label class="control-label" for="time" style="width:100px;">Time</label>
+          <div class="controls" style="margin-left:120px;">
+              <input class="input-mini" style="text-align:right; width:50px" id="time" type="time" name="hour" value="" placeholder="hour" />
+              :
+              <input class="input-mini" style="width:50px"id="time" type="time" name="minute" value="" placeholder="min" />
+              <input type="hidden" name="daynight" value="" id="btn-input" />
+              <div class="btn-group" data-toggle="buttons-radio">  
+                  <button id="btn-one" style="padding: 3px 12px; margin-bottom: -5px"type="button" data-toggle="button" name="am" value="am" class="btn btn-primary">AM</button>
+                  <button id="btn-two" style="padding: 3px 12px; margin-bottom: -5px"type="button" data-toggle="button" name="pm" value="pm" class="btn btn-primary">PM</button>
+              </div>
           </div>
       </div>
 
@@ -64,3 +78,13 @@
     </div>
   </form>
 </div>
+
+<script>
+  var btns = ['btn-one', 'btn-two'];
+  var input = document.getElementById('btn-input');
+  for(var i = 0; i < btns.length; i++) {
+    document.getElementById(btns[i]).addEventListener('click', function() {
+      input.value = this.value;
+    });
+  }
+</script>

@@ -28,7 +28,7 @@
                                     </p>
                                 <% end %>
                             <% end %>
-                        <span class="badge badge-warning"><%= @p.getInbox.count %> messages</span> <span class="badge badge-info"><%= @p.getFollowers %> followers</span>
+                        <span class="badge badge-warning"><a href="/inbox"><%= @p.getInbox.count %> messages</a></span> <span class="badge badge-info"><%= @p.getFollowers %> followers</span>
                         <div class="control-group" style="margin-top: 10px;">
                             <label class="control-label" ></label>
                             <div class="controls">

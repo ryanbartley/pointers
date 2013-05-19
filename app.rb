@@ -6,20 +6,24 @@ require 'date'
 require 'dm-serializer/to_json'
 require 'pusher'
 require './database.rb'
+require 'digest/md5'
+require 'json'
 
 set :root, File.dirname(__FILE__)
 
 require_relative 'activity'
 
+# Sessions for the temp cookie
+enable :sessions
+
 ############################
 #-------PUSHER KEY---------#
 ############################
 Pusher.app_id = '42831'
-Pusher.key = 'b0753433dcd3172ef750'
-Pusher.secret = '10038631598936f297a4'
+Pusher.key = 'd7de9fa48c3e423f3218'
+Pusher.secret = 'a002b875422e6d5558b0'
 
-# Sessions for the temp cookie
-enable :sessions
+@google_map_key = "AIzaSyB-vkhfS6BiwMLzMCrkeAQJpnjxmQn8U4Y"
 
 #----------------------------------------------------
 # These functions are defined for all the quick stuff 
@@ -49,47 +53,15 @@ helpers do
 end
 
 before do
-    #session[:email] = nil
-    @upcomingCourses = upcomingCoursesFunc
+
+
+
 end
 
-#----------------------------------------------
-# functions aiding in the sorting of this stuff
-#this is to the sort the classes by date.
-def sortingTheClasses (upcomingClasses)
-    #i need to take the values out of the database and 
-    #make a hash then return the hash so that it can 
-    #access the data members better by date. 
-    upcomingClasses.sort_by{ |k, v| v[:date]}.reverse
-end
-
-def upcomingCoursesFunc
-
-    Course.all(:order => [ :date.desc ])
-    #count up all the courses that are in the next
-    #couple of days so that we can display them to
-    #people coming to the site
-    #if(allClasses)
-    #
-    #  #get the exact time on the server when a person starts
-    #  thisTime = Time.new
-    #
-    #    for thisClass in allClasses
-    #        
-    #        #check the time and date of the classes and 
-    #        #figure out if it's within three days. This
-    #        #needs work
-    #        if thisClass.Date - thisTime.local.to_date < 3
-    #           upcomingClasses += thisClass
-    #        end
-    #
-    #    end
-    #
-    #    #Once I work out the above this will sort the classes 
-    #    #and return the sorted classes
-    #    #sortingTheClasses(upcomingClasses)
-    #end
-
+def resetSession
+    session[:firstname] = nil
+    session[:lastname] = nil
+    session[:email] = nil
 end
 
 def getLocation(courses)
@@ -97,8 +69,9 @@ def getLocation(courses)
     return courses = Courses.all
 end
 
-
-#-------------------------------------------------------
+#-------------------------------------------------------#
+################### FUNCTIONS AND ROUTES ################
+#-------------------------------------------------------#
 # Routes to take!
 # Main route  - this is the form where we take the input
 get '/' do
@@ -119,6 +92,7 @@ end
 get '/about' do
 
     @page_title = "About Us"
+
     erb :about
 
 end
@@ -126,6 +100,7 @@ end
 get '/signup' do
 
   @page_title = "Sign Up"
+
   @page_heading = "Enter a new username and password!"
 
 
@@ -133,9 +108,52 @@ get '/signup' do
 
 end
 
+post "/login" do
+
+    match = Person.first(:email => params[:email])
+
+    if match
+        
+        @p = match
+        #raise Exception, @p
+        
+        if @p.password == params[:password]
+
+            @page_title = "Profile"
+            
+            session[:email] = @p.email
+            session[:firstname] = @p.firstname.capitalize
+            session[:lastname] = @p.lastname.capitalize
+            #create the date to sort against
+
+            redirect "/profile"
+            
+        else 
+            @page_title = "Login"
+
+            @page_title = "Please Check Password"
+            @page_heading = "Please Check Password"
+            @forgotPassword = "Forgot Password?"
+            erb :login
+
+        end
+    
+    else
+
+        @page_title = "Login"
+    
+        @page_title = "Please Check email"
+        @page_heading = "That email is already in use!"
+        @forgotPassword = "Forgot Password?"
+        erb :login   
+    
+    end
+
+end
+
 post "/signedup" do
   user = Person.first(:email => params[:email])
-  #raise Exception, user
+  
   #make sure there isn't a user already listed in the database
   if !user 
     
@@ -144,7 +162,7 @@ post "/signedup" do
     
         #create a new person entry
         @p = Person.new
-        puts params[:propic]
+        
         if params[:propic] != ""
             puts "it thinks i have a pic"
             @p.createPersonPic(params[:firstname], params[:lastname], params[:email], params[:password], params[:location], params[:propic])
@@ -182,49 +200,12 @@ post "/signedup" do
       erb :signup
     end
   else 
+
       @page_title = "Email Already Exists"
       @page_heading = "That email is already in use!"
       @forgotPassword = "Forgot Password?"
       erb :signup
   end
-end
-
-post "/login" do
-
-  match = Person.first(:email => params[:email])
-
-    if match
-        
-        @p = match
-        #raise Exception, @p
-        
-        if @p.password == params[:password]
-            
-            session[:email] = @p.email
-            session[:firstname] = @p.firstname.capitalize
-            session[:lastname] = @p.lastname.capitalize
-            #create the date to sort against
-
-            redirect "/profile"
-            
-        else 
-
-            @page_title = "Please Check Password"
-            @page_heading = "Please Check Password"
-            @forgotPassword = "Forgot Password?"
-            erb :login
-
-        end
-    
-    else
-    
-        @page_title = "Please Check email"
-        @page_heading = "That email is already in use!"
-        @forgotPassword = "Forgot Password?"
-        erb :login   
-    
-    end
-
 end
 
 get '/profile' do
@@ -237,7 +218,7 @@ get '/profile' do
         @page_heading = "Your Profile"
         erb :profile
     else 
-        session[:email] = nil
+        resetSession
         @page_title = "Please Login"
         @page_heading = "Please Login"
         erb :login 
@@ -255,7 +236,7 @@ get '/changeprofile' do
         @page_heading = "Change Your Profile"
         erb :changeprofile
     else 
-        session[:email] = nil
+        resetSession
         @page_title = "Please Login"
         @page_heading = "Please Login"
         erb :login 
@@ -328,9 +309,7 @@ post '/updateprofile' do
 
     else
         
-        session[:firstname] = nil
-        session[:lastname] = nil
-        session[:email] = nil
+        resetSession
         @page_title = "Please Login"
         @page_heading = "Please Login"
         erb :login 
@@ -369,66 +348,199 @@ get '/courses' do
         @courses = Course.all(:order=>[:date.asc])
         @page_title = "Courses"
     end
-  
-      @courses = Course.all(:order=>[:date.asc])
-      @page_title = "Courses"
-      
-      erb :courses
+    
+    erb :courses
   
 end
 
 get '/courses/:title' do
 
-    @courses = Course.all 
-    @this_course = Course.first(:title => params[:title])
+    if session[:email]
+        @courses = Course.all 
+        @this_course = Course.first(:title => params[:title])
     
-    @page_title = ":title"
-    @p = Person.first(:email => session[:email])
-    @count = @courses.count
+        @page_title = :title
+        @count = @courses.count
+
+        @p = Person.first(:email => session[:email])
+        
+        if @this_course.students.first(:email => @p.email)
+            @aStudent = true
+            @aTeacher = false
+            @browser = false
+        elsif @this_course.teacher.email == @p.email 
+            @aStudent = false
+            @aTeacher = true
+            @browser = false
+        end 
     
-    if @this_course.students != nil
-        student = @this_course.students.first(:email => @p.email)
-    end
+        @comments = @this_course.comments
 
-    
-
-    if student
-        @aStudent = true
-    else 
-        @aStudent = false
-    end
-
-    if @this_course.students 
-        @classCount = (@this_course.totstu - @this_course.students.count)
+        if @this_course.students 
+            @classCount = (@this_course.totstu - @this_course.students.count)
+        else
+            @classCount = @this_course.totstu
+        end
     else
-        @classCount = @this_course.totstu
+        @courses = Course.all
+        @this_course = Course.first(:title => params[:title])
+        @page_title = :title
+        @count = @courses.count
+        @aStudent = false
+        @aTeacher = false
+        @browser = true
+
+        #TODO: ADD COMMENTS
+        @comments = @this_course.comments
+
+        if @this_course.students 
+            @classCount = (@this_course.totstu - @this_course.students.count)
+        else
+            @classCount = @this_course.totstu
+        end
+
     end
   
     erb :single_course
 
 end
 
-post '/newcourse' do
+get '/editcourse/:title' do
 
+    if session[:email]
+        @this_course = Course.first(:title => params[:title])
+    
+        @page_title = :title
+
+        @p = Person.first(:email => session[:email])
+        
+        @comments = @this_course.comments
+
+        if @this_course.students 
+            @classCount = (@this_course.totstu - @this_course.students.count)
+        else
+            @classCount = @this_course.totstu
+        end
+
+        @interests = Interest.all
+
+        erb :changecourse
+    else
+        resetSession
+        @page_title = "Please Login"
+        @page_heading = "Please Login"
+        erb :login 
+    end
+end
+
+post '/updatecourse' do
+
+    params.each do |param|
+        puts param 
+    end
+
+    p = Person.first(:email => session[:email])
+    c = Course.first(:title => params[:coursetitle])
+
+    if p && c && p.name == c.teacher.name
+
+        if c.title != params[:title]
+            title = params[:title]
+        end
+
+        date = DateTime.strptime(params[:date]+" "+params[:hour]+":"+params[:minute]+":00"+" "+params[:daynight],
+            '%Y-%m-%d %I:%M:%S %p')
+        puts date
+
+        if c.update(:title => params[:title], 
+                    :description => params[:description], 
+                    :location => params[:location],
+                    :date => date,
+                    :totstu => params[:totstu],
+                    :coursepic => params[:photo])
+        
+            if c.setInterest params[:interest]
+                puts "setinterest"
+            end 
+
+            @aStudent = false
+            @aTeacher = true
+            @browser = false
+            
+            @courses = Course.all
+            @this_course = c 
+            @page_title = @this_course.title
+            @count = @courses.count
+            @comments = @this_course.comments
+
+            if @this_course.students 
+                @classCount = (@this_course.totstu - @this_course.students.count)
+            else
+                @classCount = @this_course.totstu
+            end
+
+            erb :single_course
+
+        else
+            raise Exception, c
+        end
+        
+        
+
+    else
+        
+        resetSession
+        @page_title = "Please Login"
+        @page_heading = "Please Login"
+        erb :login 
+        
+    end
+end
+
+post '/newcourse' do
+    
     p = Person.first(:email => session[:email])
     
     if p
 
-
         @this_course = Course.new
         @courses = Course.all
-
+        date = DateTime.strptime(params[:date]+" "+params[:hour]+":"+params[:minute]+":00"+" "+params[:daynight],
+            '%Y-%m-%d %I:%M:%S %p')
+        puts date
         @this_course.createCourse(params[:title], params[:description], params[:location], 
-            params[:date], params[:totstu], params[:photo], p, params[:interest])
+            date, params[:totstu], params[:photo], p, params[:interest])
         
         @count = @courses.count
         @classCount = @this_course.totstu
         
+        @aTeacher = true
+        @aStudent = false
 
         erb :single_course
     else
         "You're not logged in"
     end     
+end
+
+get '/startclass/:course' do
+
+    @p = Person.first(:email => session[:email])
+    
+    course = Course.first(:title => params[:course])
+
+    course.createChannelName
+    
+    @courses = Course.all 
+    @this_course = course
+    if @this_course.chat == nil
+        @this_course.createChat
+    end
+
+    @page_title = @this_course.title.capitalize
+
+    erb :livecourse
+
 end
 
 get '/livecourse/:course' do
@@ -506,7 +618,7 @@ get '/users/:slug' do
 
     @this_profile = Profile.first(:slug => params[:slug])
     #raise Exception, @date = @this_course.strftime([format='%A %d %b %Y'])
-    @page_title = ":slug"
+    @page_title = :slug
 
     @this_person = Person.get(@this_profile.person_id)
     @people = Person.all
@@ -515,8 +627,7 @@ get '/users/:slug' do
     
 
     erb :single_user
-    
-    
+        
 end
 
 get '/users' do
@@ -532,24 +643,123 @@ end
 
 get '/logout' do
 
-    session[:firstname] = nil
-    session[:lastname] = nil
-    session[:email] = nil
+    resetSession
     redirect "/"
 
 end
 
-get '/test_associations' do
-    CoursePerson.all(:person_id => 5) do |course|
-        puts course
+get '/inbox' do
+
+    @p = Person.first(:email => session[:email])
+    
+    if @p 
+        @count = @p.getInbox.count
+        @sentCount = @p.getSent.count
+        erb :inbox
+    else
+        resetSession
+        @page_title = "Please Login"
+        @page_heading = "Please Login"
+        erb :login 
     end
 end
 
-get '/test_ajax' do
-    
-    @course = Course.all
+post '/new_message' do
+
+    m = Message.new
+
+    sender = Person.first(:email=>session[:email])
+    receiver = Person.first(:name => params[:receiver])
+    m.subject = params[:subject]
+    m.bodytext = params[:message]
+
+    m.sendMail(sender, receiver)
+
+    redirect('/inbox')
 
 end
+
+post '/chat' do
+
+    chat_info = params[:chat_info]
+
+    chat_info.each do |info|
+        puts "this is chat info " + info.to_json
+    end
+
+    p = Person.first(:id => chat_info['id'])
+    c = Course.first(:id => chat_info['courseid'])
+
+    puts "the person's name is " + p.name
+    puts "The course's title is " + c.title + " and the courses channel is " + c.createChannelName
+
+    channel_name = nil
+
+    if( !chat_info )
+      status 400
+      puts 'chat_info must be provided'
+    end
+
+    channel_name = get_channel_name(chat_info["channel"])
+    puts "the created channel_name is " + channel_name
+    options = sanitise_input(chat_info)
+
+    puts "the newly sanitised input is "
+    options.each do |option|
+        puts option
+    end
+
+    activity = Activity.new('chat-message', options['text'], options)
+
+    data = activity.getMessage()
+
+    data.each do |dat|
+        puts dat.to_json
+    end
+
+    if (c.addRemark(channel_name, p, options['text']))
+        puts "added a remark"
+        response = Pusher[channel_name].trigger('chat_message', data)
+
+        result = {'activity' => data, 'pusherResponse' => response}
+
+        status 200
+        headers \
+            'Cache-Control' =>  'no-cache, must-revalidate',
+            'Content-Type' =>  'application/json'
+    
+        puts result.to_json
+    else 
+
+
+
+    end
+
+end
+
+def get_channel_name(http_referer)
+    pattern = /(\W)+/
+    channel_name = http_referer.gsub pattern, '-'
+    return channel_name
+end
+
+def sanitise_input(chat_info)
+
+    email = chat_info['email']?chat_info['email']:''
+    
+    options = {}
+    options['id'] = chat_info['id']
+    options['channel'] = escape_html(chat_info['channel']).slice(0,70)
+    options['displayName'] = escape_html(chat_info['nickname']).slice(0, 30)
+    options['text'] = escape_html(chat_info['text']).slice(0, 300)
+    options['email'] = escape_html(email).slice(0, 100)
+    options['propic'] = chat_info['propic']
+    return options
+end
+
+################################################################
+#--------------ALL OF THE HELPER ROUTES FOR TESTING------------#
+################################################################
 
 get '/setinterests' do
     
@@ -569,57 +779,59 @@ get '/setinterests' do
     
 end
 
-post '/chat' do
+#--------------------------------------------------------#
+#--------------- TESTING THE CHAT -----------------------#
+#--------------------------------------------------------#
 
-    p = Person.first(:email => session[:email])
+get '/testchat' do
+    erb :testChat
+end
 
-    chat_info = params[:chat_info]
+post '/testchat/login' do
+    session[:username] = params[:username]  
+    session[:userid] = Digest::MD5.hexdigest(session[:username])
+    puts session[:userid]
+    success = {'success' => true}
+    success.to_json
+end
 
-    channel_name = nil
+post '/pusher/auth' do
+    @socket_id = params[:socket_id]
+    @channel_name = params[:channel_name]
+    puts @socket_id
+    puts @channel_name
+    # if session[:username].hasAccessTo(@channel_name) == false
 
-    if( !chat_info )
-      status 400
-      puts 'chat_info must be provided'
+    # end
+
+    response = Pusher[@channel_name].authenticate(@socket_id,{
+        user_id: session[:username],
+        user_info: {} # optional
+    })
+    puts response
+    response.to_json
+end
+
+get '/test_associations' do
+    CoursePerson.all(:person_id => 5) do |course|
+        puts course
     end
+end
 
-    if( !request.referer )
-      status 400
-      puts 'channel name could not be determined from request.referer'
-    end
-
-    channel_name = get_channel_name(request.referer)
-    options = sanitise_input(chat_info)
-
-    activity = Activity.new('chat-message', options['text'], options)
-
-    data = activity.getMessage()
-
-    response = Pusher[channel_name].trigger('chat_message', data)
-
-    result = {'activity' => data, 'pusherResponse' => response}
-
-    status 200
-    headers \
-      'Cache-Control' =>  'no-cache, must-revalidate',
-      'Content-Type' =>  'application/json'
+get '/test_ajax' do
     
-    body result.to_json
+    @course = Course.all
+
 end
 
-def get_channel_name(http_referer)
-    pattern = /(\W)+/
-    channel_name = http_referer.gsub pattern, '-'
-    return channel_name
-end
+post '/testchat/send_message' do
+    @message = params[:message]
 
-def sanitise_input(chat_info)
-    email = chat_info['email']?chat_info['email']:''
-    
-    options = {}
-    options['displayName'] = escape_html(chat_info['nickname']).slice(0, 30)
-    options['text'] = escape_html(chat_info['text']).slice(0, 300)
-    options['email'] = escape_html(email).slice(0, 100)
-    options['get_gravatar'] = true
-    return options
-end
+    @message = "<strong>" + session[:username] + "</strong>:" + @message
 
+    Pusher.trigger('presence-nettuts', 'new_message', @message)
+
+    response = {'message' => @message, 'success' => true}
+    puts response
+    response.to_json
+end

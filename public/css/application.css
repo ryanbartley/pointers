@@ -128,6 +128,11 @@ body {
 .classes < a:active{
 	color: #000000;
 		text-decoration: none;
+}
 
+.badge a{
+
+text-decoration: none;
+color: white;
 
 }

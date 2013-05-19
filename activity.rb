@@ -5,22 +5,33 @@ class Activity
   
   def initialize(activity_type, action_text, options)
     
-    @options = set_default_options(options)
-      
+    # @options = set_default_options(options)
+    
     @type = activity_type
     @id = UUID.new.generate
     @date = Time.now.to_s()
-    
+
+    puts "initializing activity"
+    puts "type " + @type
+    puts "id " + @id
+    puts "date " + @date
+
     @action_text = action_text;
-    @display_name = options["displayName"]
-    @image = options['image'];
-    
-    if( options['get_gravatar'] &&
-        options['email'] )
-         
-      @image["url"] = get_gravatar(options['email'])
-      
-    end
+    @display_name = options['displayName']
+    @email = options['email']
+    @personid = options['id']
+
+    @image = {}
+    @image['url'] = options['propic']
+    @image['width'] = 48
+    @image['height'] = 48
+
+    puts "action_text " + @action_text
+    puts "displayName " + options['displayName']
+    puts " and this is what it presented " + @display_name
+    puts "image url " + @image['url']
+    puts "email " + @email
+    puts "personid " + @personid
     
   end
   
@@ -33,7 +44,9 @@ class Activity
       'actor' => {
         'displayName' => @display_name,
         'objectType' => 'person',
-        'image' => @image
+        'image' => @image,
+        'email' => @email,
+        'id' => @personid
       }
     }
     return activity
