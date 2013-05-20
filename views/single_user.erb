@@ -25,7 +25,7 @@
 							About Me
 						</legend>
 						</span>
-						<span class="row" style="overflow-y: auto">
+						<span class="row" style="overflow-y: auto; font-size: 12px; margin-left: 0px">
 							<%= @this_person.aboutme %>
 						</span>
 					</span>
@@ -121,6 +121,7 @@
 
 var follow = $('#follow');
 var message = $('#message');
+var data = {};
 
 
 $(document).ready(function(){
@@ -131,9 +132,25 @@ $(document).ready(function(){
 		messageModal();
 	});
 
-	<% if @aFollower %>
-		follow.addClass('btn-primary');
-		follow.html('Following');
+	<% if !@me %>
+		<% if @aFollower %>
+			follow.addClass('btn-primary');
+			follow.html('Following');
+			data = {
+				profile: '<%= @this_person.profile.slug %>',
+				myemail: '<%= session[:email] %>',
+				following: true
+			};
+		<% else %>
+			data = {
+				profile: '<%= @this_person.profile.slug %>',
+				myemail: '<%= session[:email] %>',
+				following: false
+			};
+		<% end %>
+	<% else %>
+		follow.hide();
+		message.hide();
 	<% end %>
 
 });
@@ -143,17 +160,55 @@ function messageModal() {
 	// grab the button data
 	// send it to the data
 	// create the ajax and send it
+	var customModal = $(
+		'<div class="custom-modal modal hide fade" tabindex="-1" role="dialog" aria-hidden="true">' +
+			'<div class="modal-header">' + 
+				'<button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>' +
+			'</div>' +
+			'<div class="modal-body">' + 
+				'<div class="row span6" style="width: 100%; margin-left: 0px" >' +
+					'<%= @this_person.name %>' +
+				'</div>' +
+				'<div class="row span6">' +
+					'<div class="control-group">' +
+          				'<label class="control-label" for="subject" >SUBJECT</label>' +
+          				'<div class="controls" >' +
+              				'<input class="input-large" id="subject" type="text" name="subject" value="" />' +
+          				'</div>' +
+      				'</div>' +
+      			'</div>' +
+			'</div>' +
+			'<div class="row span6" style="width: 100%; margin-left: 0px" >' +
+				'<input type="textarea" style="width: 100%" id="messagebody"></textarea>' +
+			'</div>' +
+			
+			'<div class="modal-footer">' +
+				'<button class="btn" data-dismiss="modal">' + 
+					'Close' + 
+				'</button>' + 
+			'</div>' + 
+		'</div>');
+
+
+    $('body').append(customModal);
+    $(this).find($('h3')).clone().appendTo('.custom-modal .modal-header');
+    $(this).find('.device-product, .device-details').clone().appendTo('.custom-modal .modal-body');
+    $('.custom-modal .hide').show();
+    $('.custom-modal').modal();
+  
+  	$('.custom-modal').on('hidden', function(){
+ 		console.log("hidden");
+    	$('.custom-modal').remove();
+	
+});
 }
 
 function followAjax() {
-	data = {
-		profile: '<%= @this_person.profile.slug %>',
-		myemail: '<%= session[:email] %>'
-	};
 
 	$.ajax({
         url: '/ajax/follow',
         type: 'post',
+        dataType: "json",
         data: {
             'postinfo': data
         },
@@ -161,10 +216,22 @@ function followAjax() {
             console.log('Chat message sent. Result: ' + status + ' : ' + xhr.responseText);
         },
         success: function(result) {
-        	if (result.following) { 
-            	$('#follow').addClass('btn-primary');
-            } else {
-            	alert('problem with adding the follower');
+        	;
+        	//alert("result is " + result);
+        	console.log(result);
+
+        	if (result.activity.following) { 
+        		data.following = true;
+            	follow.addClass('btn-primary');
+            	follow.html('Following');
+            } else if (result.activity.notfollowing){
+            	data.following = false;
+            	follow.removeClass('btn-primary');
+            	follow.html('Follow Me');
+            } else if (result.activity.me) {
+            	data.following = false;
+            	follow.hide();
+            	message.hide();
             }
         }
     })

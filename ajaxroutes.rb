@@ -7,14 +7,30 @@ post '/ajax/follow' do
 
 	data = {}
 
-	if pfollowed == pfollowing
-		if checkFollowing
-			data['following'] = pfollowing.follow pfollowed
-		else
-			
+	postinfo.each do |info|
+		puts info
+	end
+
+	if pfollowed.id != pfollowing.id
+		if postinfo['following'] == "false"
+			if pfollowing.follow pfollowed
+				puts "they are now following"
+				data['following'] = true
+				data['me'] = false
+				data['notfollowing'] = false
+			end
+		else 
+			if pfollowing.unfollow pfollowed
+				puts "they are not following"
+				data['notfollowing'] = true
+				data['following'] = false
+				data['me'] = false
+			end
 		end
 	else
-
+		data['following'] = false
+		data['me'] = true
+		data['notfollowing'] = false
 	end
 
 	result = {'activity' => data, 'status' => "OK"}
@@ -43,6 +59,12 @@ def getPersonFromProfile(slug)
 end
 
 def checkFollowing(following, followed)
-
+	peopleImFollowing = following.getFollowingPeople
+	peopleImFollowing.each do |person|
+		if person.id == followed.id
+			return true
+		end
+	end
+	return false
 end
 

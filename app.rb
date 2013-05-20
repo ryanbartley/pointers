@@ -168,7 +168,9 @@ post "/signedup" do
         
         if params[:propic] != ""
             puts "it thinks i have a pic"
-            @p.createPersonPic(params[:firstname], params[:lastname], params[:email], params[:password], params[:location], params[:propic])
+            @p.createPersonPic(params[:firstname], params[:lastname], params[:email], 
+                params[:password], params[:location], params[:propic], params[:lat], 
+                params[:lng], params[:geoloc])
 
             #create the session id
             session[:email] = @p.email
@@ -182,7 +184,9 @@ post "/signedup" do
         
         else
 
-            @p.createPerson(params[:firstname], params[:lastname], params[:email], params[:password], params[:location])
+            @p.createPerson(params[:firstname], params[:lastname], params[:email], 
+                params[:password], params[:location], params[:lat], params[:lng],
+                params[:geoloc])
 
             #create the session id
             session[:email] = @p.email
@@ -273,7 +277,10 @@ post '/updateprofile' do
                     :password => params[:newpassword],
                     :teacher => params[:group1],
                     :propic => params[:propic], 
-                    :teacher => teach)
+                    :teacher => teach,
+                    :lat => params[:lat],
+                    :long => params[:lng],
+                    :geoloc => params[:geoloc])
                     
                     if i = Interest.first(:keyword => params[:interest])
                         
@@ -293,7 +300,10 @@ post '/updateprofile' do
                 :email => params[:email],
                 :teacher => params[:group1], 
                 :propic => params[:propic],
-                :teacher => teach)
+                :teacher => teach,
+                :lat => params[:lat],
+                :long => params[:lng],
+                :geoloc => params[:geoloc])
                 
                 if i = Interest.first(:keyword => params[:interest])
                     
@@ -629,13 +639,23 @@ get '/users/:slug' do
     
         @this_person = Person.get(@this_profile.person_id)  
         
-        followers = p.getFollowerPeople
-
-        if followers.first(:email => p.email)
-            @aFollower = true
-        else
+        if @this_person.id == p.id
+            @me = true
             @aFollower = false
+
+        else
+            @me = false
+            followers = p.getFollowerPeople
+
+            if checkFollowing p, @this_person
+                @aFollower = true
+            else
+                @aFollower = false
+            end
+
         end
+
+        
 
         @browser = false
     else
@@ -647,6 +667,7 @@ get '/users/:slug' do
            
         @aFollower = false
         @browser = true
+        @me = false
     end
 
     erb :single_user

@@ -30,6 +30,9 @@ class Person
     property :totalrating   , Integer , :default => 0
     property :totalrated    , Integer , :default => 0
     property :aboutme       , Text 
+    property :lat           , Float
+    property :long          , Float
+    property :geoloc        , String
   
     class Link
   
@@ -101,7 +104,7 @@ class Person
         self.firstname.capitalize + " " + self.lastname.capitalize
     end
   
-    def createPersonPic(firstname, lastname, email, password, location, propic)
+    def createPersonPic(firstname, lastname, email, password, location, propic, lat, long, geoloc)
         self.firstname = firstname
         self.lastname = lastname
         self.email = email.downcase
@@ -109,18 +112,24 @@ class Person
         self.location = location
         self.propic = propic
         created_at = DateTime.now
+        self.lat = lat
+        self.long = long
+        self.geoloc = geoloc
         lastLogin = created_at
         self.setProfile
         self.save
     end
   
-    def createPerson(firstname, lastname, email, password, location)
+    def createPerson(firstname, lastname, email, password, location, lat, long, geoloc)
         self.firstname = firstname
         self.lastname = lastname
         self.email = email.downcase
         self.password = password
         self.location = location
         created_at = DateTime.now
+        self.lat = lat
+        self.long = long
+        self.geoloc = geoloc
         lastLogin = created_at
         self.setProfile
         self.save
