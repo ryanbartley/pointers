@@ -12,6 +12,7 @@ require 'json'
 set :root, File.dirname(__FILE__)
 
 require_relative 'activity'
+require_relative 'ajaxroutes'
 
 # Sessions for the temp cookie
 enable :sessions
@@ -68,6 +69,8 @@ def getLocation(courses)
     #this will change to get specific courses
     return courses = Courses.all
 end
+
+
 
 #-------------------------------------------------------#
 ################### FUNCTIONS AND ROUTES ################
@@ -509,7 +512,8 @@ post '/newcourse' do
             '%Y-%m-%d %I:%M:%S %p')
         puts date
         @this_course.createCourse(params[:title], params[:description], params[:location], 
-            date, params[:totstu], params[:photo], p, params[:interest])
+            date, params[:totstu], params[:photo], p, params[:interest], params[:lat], params[:lng],
+            params[:geoloc])
         
         @count = @courses.count
         @classCount = @this_course.totstu
@@ -530,7 +534,8 @@ get '/startclass/:course' do
     course = Course.first(:title => params[:course])
 
     course.createChannelName
-    
+    course.started = true
+
     @courses = Course.all 
     @this_course = course
     if @this_course.chat == nil
@@ -616,15 +621,33 @@ end
 
 get '/users/:slug' do
 
-    @this_profile = Profile.first(:slug => params[:slug])
-    #raise Exception, @date = @this_course.strftime([format='%A %d %b %Y'])
-    @page_title = :slug
-
-    @this_person = Person.get(@this_profile.person_id)
-    @people = Person.all
-    @count = @people.count    
-    puts @this_person.name
+    if session[:email]
+        p = Person.first(:email => session[:email])
+        @this_profile = Profile.first(:slug => params[:slug])
+        #raise Exception, @date = @this_course.strftime([format='%A %d %b %Y'])
+        @page_title = params[:slug]
     
+        @this_person = Person.get(@this_profile.person_id)  
+        
+        followers = p.getFollowerPeople
+
+        if followers.first(:email => p.email)
+            @aFollower = true
+        else
+            @aFollower = false
+        end
+
+        @browser = false
+    else
+        @this_profile = Profile.first(:slug => params[:slug])
+        #raise Exception, @date = @this_course.strftime([format='%A %d %b %Y'])
+        @page_title = params[:slug]
+    
+        @this_person = Person.get(@this_profile.person_id)
+           
+        @aFollower = false
+        @browser = true
+    end
 
     erb :single_user
         

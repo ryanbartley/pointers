@@ -18,9 +18,9 @@
       <div class="control-group">
           <label class="control-label" for="time" style="width:100px;">Time</label>
           <div class="controls" style="margin-left:120px;">
-              <input class="input-mini" style="text-align:right; width:50px" id="time" type="time" name="hour" value="" placeholder="hour" />
+              <input class="input-mini" style="text-align:right; width:50px" id="hour" type="time" name="hour" value="" placeholder="hour" />
               :
-              <input class="input-mini" style="width:50px"id="time" type="time" name="minute" value="" placeholder="min" />
+              <input class="input-mini" style="width:50px"id="minute" type="time" name="minute" value="" placeholder="min" />
               <input type="hidden" name="daynight" value="" id="btn-input" />
               <div class="btn-group" data-toggle="buttons-radio">  
                   <button id="btn-one" style="padding: 3px 12px; margin-bottom: -5px"type="button" data-toggle="button" name="am" value="am" class="btn btn-primary">AM</button>
@@ -42,18 +42,21 @@
               <input class="input-large" id="location" type="text" name="location" value="" />
           </div>
       </div>
+      <input type="hidden" name="lat" value="" id="lat" />
+      <input type="hidden" name="lng" value="" id="lng" />
+      <input type="hidden" name="geoloc" value="" id="geoloc" />
      
       <div class="control-group">
           <label class="control-label" for="date" style="width:100px;">Description</label>
           <div class="controls" style="margin-left:120px;">
-              <textarea style="width: 210px" rows="6" cols="80" name="description"></textarea>
+              <textarea style="width: 210px" rows="6" cols="80" id="description" name="description"></textarea>
           </div>
       </div>
 
       <div class="control-group">
           <label class="control-label" for="date" style="width:100px;">Photo</label>
           <div class="controls" style="margin-left:120px;">
-              <textarea style="width: 210px" rows="1" cols="80" name="photo" placeholder="Enter Image URL"></textarea>
+              <textarea style="width: 210px" rows="1" cols="80" id="photo" name="photo" placeholder="Enter Image URL"></textarea>
           </div>
       </div>
 
@@ -71,7 +74,8 @@
       </div>
       
       <div class="form-actions" style="padding-left: 10px;">
-                    <button type="submit" class="btn btn-primary">Save changes</button>
+                    <button type="submit" id="submitButton" hidden></button>
+                    <button type="button" id="fake" class="btn btn-primary">Save changes</button>
                     <a type="button" class="btn" href="/courses">Cancel</a>
                 </div> 
             </div>
@@ -79,12 +83,56 @@
   </form>
 </div>
 
+<script type="text/javascript" src="//maps.googleapis.com/maps/api/js?sensor=false&key=<%= @google_map_key %>">
+</script>
 <script>
-  var btns = ['btn-one', 'btn-two'];
-  var input = document.getElementById('btn-input');
-  for(var i = 0; i < btns.length; i++) {
-    document.getElementById(btns[i]).addEventListener('click', function() {
-      input.value = this.value;
+    var btns = ['btn-one', 'btn-two'];
+    var input = document.getElementById('btn-input');
+    var geocoder;
+
+    for(var i = 0; i < btns.length; i++) {
+        document.getElementById(btns[i]).addEventListener('click', function() {
+            input.value = this.value;
+        });
+    }
+
+    function initialize() {
+        // create the geocoder
+        geocoder = new google.maps.Geocoder();
+    }
+ 
+    // when page is ready, initialize the map!
+    google.maps.event.addDomListener(window, 'load', initialize);
+
+    // add location button event
+    $("#fake").click(function(e){
+        
+        // get the location text field value
+        var loc = $("#location").val();
+
+        console.log("user entered location = " + loc);
+        
+        geocoder.geocode( { 'address': loc }, function(results, status) {
+            alert("is this running " + status);
+            if (status == google.maps.GeocoderStatus.OK) {
+ 
+                // log out results from geocoding
+                console.log("geocoding results");
+                console.log(results);
+        
+                // preparing data for form posting
+                var lat = results[0].geometry.location.lat();
+                var lng = results[0].geometry.location.lng();
+                var loc_name = results[0].formatted_address;
+                $("#lat").val(lat);
+                $("#lng").val(lng);
+                $("#geoloc").val(loc_name);
+
+                $("#submitButton").click();
+            } else {
+               alert("Try again. Geocode was not successful for the following reason: " + status);
+            }
+        });
+        
     });
-  }
 </script>

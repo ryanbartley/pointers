@@ -1,94 +1,148 @@
-
-<div class="hero-unit span7">
+<div class="hero-unit span9">
 	<div>
-
 		<div>
 			<p>
-				<legend><a href="#"><%= @this_course.title %></a><span style="float: right;"><i class=""></i> <%= @this_course.date.strftime("%A %m/%d/%y") %></legend>
+				<legend><a href=""><%= @this_course.title %><span style="float: right;"><i class=""></i> <%= @this_course.date.strftime("%A %m/%d/%y") %></span></legend>
 			</p>
 		</div>
 	</div>
-	<div class="row">
-	<div class="span3" >
-			<div class="row">
-			<a class="thumbnail">
-				<p style="margin: 0 0 0px;">
-					<img src="<%= @this_course.coursepic %>" alt="">
-				</p>
-			</a>
-		</div>
-		<div class="row">
-				Seats Remaining: <%= @classCount %>
-		</div>
-		<div class="row">
-			<% if !@aTeacher %>
-				<% if @aStudent %> 
-					<p><a href="/leaveclass/<%= @this_course.title %>" class="btn" >Leave Class</a></p>
-				<% elsif @classCount > 0  %>
-					<p><a href="/enrollclass/<%= @this_course.title %>" class="btn" >Join Class</a></p>
-				<% elsif @classCount <= 0  %>
-					<p>CLASS CLOSED</p>
-				<% elsif @browser %>
-
-				<% end %>
-			<% elsif @aTeacher %>
-				<p><a href="/editcourse/<%= @this_course.title %>" class="btn" >Edit Class</a></p>
-				<p><a href="/startclass/<%= @this_course.title %>" id="startclass" class="btn" >Start Class</a></p>
-				<% if @this_course.classStart %>
-					<p><a href="/startclass/<%= @this_course.title %>" id="startclass" class="btn" >Start Class</a></p>
-				<% end %>
-			<% end %>
-		
-			<div class="pull-right">
-				<!-- JOIN LIVE CLASS BUTTON -->
-				<% if @aStudent %> 
-          			<p><a href="/livecourse/<%= @this_course.title %>" class="btn" >Join Live Class</a></p>
-        		<% end %>
-        	</div>
-
- 		</div>	
+	<div class="row span9">
 		
 		<div class="row">
-			<p>
-				<i class="icon-tags"></i> Tags :
-
-				<% @this_course.interests.each do |interest| %>
-					
-					<a href="/interests/<%= interest.keyword %>">
-						<span class="label label-info">
-							<%= interest.keyword %>
+			<div class="span3" >
+					<a class="thumbnail">
+						<p style="margin: 0 0 0px;">
+							<img src="<%= @this_course.coursepic %>" alt="">
+						</p>
+					</a>
+			</div>
+			<div class="span6">
+				<div class="row">	
+					<!-- ABOUT ME SECTION -->
+					<span class="span3">
+						<span class="row">
+						<legend style="margin-bottom:10px; font-size:20px">
+							Description
+						</legend>
 						</span>
-					</a>
-
-				<% end %>
-				
-			</p>
-			<p>
-				<legend>Students Enrolled</legend>
-				<% students = @this_course.students %>
-				<% students.each do |student| %>
-
-					<a href="/users/<%= student.profile.slug %>">
-						<%= student.name %>
-					</a>
-
-				<% end %>
+						<span class="row" style="overflow-y: auto; font-size:12px">
+							<%= @this_course.description %>
+						</span>
+					</span>
+					<span class="span3" style="float: right; text-align: center">
+						<div class="row" style="padding-top:10px; padding-bottom:10px">
+							
+							Teacher Rating: 0
+						</div>
+						<div class="row">
+							Seats Remaining: <%= @classCount %>
+						</div>
+						<% if !@aTeacher %>
+							<% if @aStudent %> 
+								<div class="row" style="padding-top:10px; padding-bottom:10px">
+									<p><a href="/leaveclass/<%= @this_course.title %>" class="btn" >Leave Class</a></p>
+								</div>
+									<% if @this_course.started %>
+										<div class="row" style="padding-top:10px; padding-bottom:10px">
+											<p><a href="/livecourse/<%= @this_course.title %>" class="btn" >Join Live Class</a></p>
+										</div>
+									<% end %>
+							<% elsif @classCount > 0  %>
+								<div class="row" style="padding-top:10px; padding-bottom:10px">
+									<p><a href="/enrollclass/<%= @this_course.title %>" class="btn" >Join Class</a></p>
+								</div>
+							<% elsif @classCount <= 0  %>
+								<div class="row" style="padding-top:10px; padding-bottom:10px">
+									<p>CLASS CLOSED</p>
+								</div>
+							<% elsif @browser %>
+								<div class="row" style="padding-top:10px; padding-bottom:10px">
+									<!-- Here's where we'll get people to join -->
+								</div>
+							<% end %>
+						<% elsif @aTeacher %>
+							<div class="row" style="padding-top:10px; padding-bottom:10px">
+								<p><a href="/editcourse/<%= @this_course.title %>" class="btn" >Edit Class</a></p>
+							</div>
+							<div class="row" style="padding-top:10px; padding-bottom:10px">
+								<p><a href="/startclass/<%= @this_course.title %>" id="startclass" class="btn" >Start Class</a></p>
+							</div>
+							<% if @this_course.classStart %>
+								<div class="row" style="padding-top:10px; padding-bottom:10px">
+									<p><a href="/startclass/<%= @this_course.title %>" id="startclass" class="btn" >Start Class</a></p>
+								</div>
+							<% end %>
+						<% end %>
+					</span>
+				</div>
+			</div>
 		</div>
-	</div>
+		<div class="row">
+			<div class="span3">
+				<div class="row">
+					<span class="span3" style="float: left; text-align: center">
+						<legend style="margin-bottom:10px">
+							Interests
+						</legend>
+					</span> 
+				</div>
+				<div class="row">
+					<div class="span3">
+						<% @this_course.interests.each do |interest| %>
+					
+							<a href="/interests/<%= interest.keyword %>">
+								<span class="label label-info">
+									<%= interest.keyword %>
+								</span>
+							</a>
 
-		<div class="span4">
+						<% end %>
+					</div>
+				</div>
+			</div>
+			<div class="span6">
+				<div class="row">
+						
+					<span class="span3" style="float: left; text-align: center">
+						<legend style="margin-bottom:10px">
+							Teacher's History
+						</legend>
+					</span> 
+					<span class="span3"style="float: right; text-align: center">
+						<legend style="margin-bottom:10px">
+							Students Enrolled
+						</legend>
+					</span>
+				</div>
+				<div class="row">
+					<span class="span3" style="float: left; font-size: 12px; text-align: center; line-height: 14px">
+						<% teacher = @this_course.teacher %>
+						<% courses = teacher.getTeachClasses %>
+						<% courses.each do |course| %>
+							<span class="row">
+								<a href="/users/<%= course.title %>">
+									<%= course.title %>
+								</a>
+							</span>
 
-			<i class="icon-user"></i><a href="#"> <%= @this_course.teacherName %> </a>      
-			<p>
-				<%= @this_course.description %>
-			</p>
+						<% end %>
+					</span>
+					<span class="span3" style="float: left; font-size: 12px; text-align: center; line-height: 14px">
+						<% students = @this_course.students %>
+						<% students.each do |student| %>
+
+							<a href="/users/<%= student.profile.slug %>">
+								<%= student.name %>
+							</a>
+
+						<% end %>
+					</span>
+				</div>
+			</div>
 		</div>
-	</div>
-	
-			
-			
 	</div>
 </div>
+
 
 
 <!-- TO DO: change the class of course so that there can be a more unique way of identifying this class from other classes, preferably with a unique id instead of title. -->

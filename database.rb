@@ -29,6 +29,7 @@ class Person
     property :propic        , String  , :length => 255, :default => "http://critterapp.pagodabox.com/img/user.jpg"
     property :totalrating   , Integer , :default => 0
     property :totalrated    , Integer , :default => 0
+    property :aboutme       , Text 
   
     class Link
   
@@ -263,6 +264,10 @@ class Course
     property :location        , String    
     property :coursepic       , String,    :length => 255
     property :description     , Text,      :required => true
+    property :started         , Boolean,   :default => false
+    property :lat             , Float
+    property :long            , Float
+    property :geoloc          , String
     
     ##################################################
     ####### ASSOCIATIONS #############################
@@ -293,7 +298,7 @@ class Course
        
     end
   
-    def createCourse(title, description, location, date, totalstudent, coursepic, teacher, interest)
+    def createCourse(title, description, location, date, totalstudent, coursepic, teacher, interest, lat, lng, geoloc)
         self.title = title
         self.date = date
         self.description = description
@@ -301,6 +306,9 @@ class Course
         self.coursepic = coursepic
         self.created_at = DateTime.now
         self.location = location
+        self.lat = lat.to_f
+        self.long = lng.to_f
+        self.geoloc = geoloc
         add_teacher teacher
         self.setInterest interest
         self.setProfile
@@ -308,7 +316,7 @@ class Course
         self.save 
     end
 
-    def updateCourse(title, description, location, date, totalstudent, coursepic, interest)
+    def updateCourse(title, description, location, date, totalstudent, coursepic, interest, lat, lng, geoloc)
         self.title = title
         self.date = date
         self.description = description
@@ -316,6 +324,9 @@ class Course
         self.coursepic = coursepic
         self.created_at = DateTime.now
         self.location = location
+        self.lat = lat
+        self.lng = lng
+        self.geoloc = geoloc
         self.setInterest interest
         self.createChannelName
         self.save 
