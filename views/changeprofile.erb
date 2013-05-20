@@ -134,7 +134,7 @@
         console.log("user entered location = " + loc);
         
         geocoder.geocode( { 'address': loc }, function(results, status) {
-            alert("is this running " + status);
+            
             if (status == google.maps.GeocoderStatus.OK) {
  
                 // log out results from geocoding

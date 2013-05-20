@@ -318,12 +318,13 @@ class Course
         self.lat = lat.to_f
         self.long = lng.to_f
         self.geoloc = geoloc
-        add_teacher teacher
-        self.setInterest interest
-        self.setProfile
-        self.createChannelName
+        puts add_teacher teacher
+
+        puts self.setInterest interest
+        puts self.setProfile
+        puts self.createChannelName
         #raise Exception, self.to_json
-        self.save 
+        puts self.save 
     end
 
     def updateCourse(title, description, location, date, totalstudent, coursepic, interest, lat, lng, geoloc)
