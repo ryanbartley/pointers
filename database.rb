@@ -115,7 +115,7 @@ class Person
         self.lat = lat
         self.long = long
         self.geoloc = geoloc
-        lastLogin = created_at
+        self.lastLogin = created_at
         self.setProfile
         self.save
     end
@@ -127,10 +127,10 @@ class Person
         self.password = password
         self.location = location
         created_at = DateTime.now
-        self.lat = lat
-        self.long = long
-        self.geoloc = geoloc
-        lastLogin = created_at
+        # self.lat = lat
+        # self.long = long
+        # self.geoloc = geoloc
+        self.lastLogin = created_at
         self.setProfile
         self.save
     end
@@ -255,7 +255,7 @@ class Courseprofile
     include DataMapper::Resource
   
     property :id   , Serial, :key => true
-    property :slug , String, :required => true 
+    property :slug , String #:required => true 
   
     belongs_to :course 
 end
@@ -266,17 +266,17 @@ class Course
     property :id              , Serial,    :key => true
     property :slug            , String,    :default => lambda { | resource, prop| resource.title.downcase.gsub " ", "" }
     property :channel_name    , Text 
-    property :title           , String,    :required => true
-    property :date            , DateTime,  :required => true
+    property :title           , String    #:required => true
+    property :date            , DateTime  #:required => true
     property :created_at      , DateTime   #This should be required.
     property :totstu          , Integer
     property :location        , String    
     property :coursepic       , String,    :length => 255
-    property :description     , Text,      :required => true
+    property :description     , Text      #:required => true
     property :started         , Boolean,   :default => false
-    property :lat             , Float
-    property :long            , Float
-    property :geoloc          , String
+    property :lat             , String
+    property :long            , String
+    property :geoloc          , String,      :length => 300
     
     ##################################################
     ####### ASSOCIATIONS #############################
@@ -322,6 +322,7 @@ class Course
         self.setInterest interest
         self.setProfile
         self.createChannelName
+        #raise Exception, self.to_json
         self.save 
     end
 
