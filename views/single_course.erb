@@ -47,11 +47,11 @@
 											<p><a href="/livecourse/<%= @this_course.title %>" class="btn" >Join Live Class</a></p>
 										</div>
 									<% end %>
-							<% elsif @classCount > 0  %>
+							<% elsif @classCount > 0 && !@browser  %>
 								<div class="row" style="padding-top:10px; padding-bottom:10px">
 									<p><a href="/enrollclass/<%= @this_course.title %>" class="btn" >Join Class</a></p>
 								</div>
-							<% elsif @classCount <= 0  %>
+							<% elsif @classCount <= 0 && !@browser %>
 								<div class="row" style="padding-top:10px; padding-bottom:10px">
 									<p>CLASS CLOSED</p>
 								</div>
