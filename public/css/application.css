@@ -15,12 +15,27 @@ body {
 
 .siteTitle{
 	line-height: 40px;
+	font-size: 30px;
+	font-family: 'Syncopate', sans-serif;
+	padding: 0px;
+	margin-bottom: 100px;
+}
+
+.indexTitle {
+	line-height: 100px;
 	margin-left: 10px;
 	margin-right: 40px;
-	font-size: 30px;
+	font-size: 130px;
 	font-family: 'Syncopate', sans-serif;
 	padding: 0px; 
 	margin-right: 20px;
+}
+
+.underIndexTitle {
+	line-height: 100px;
+	text-align: center;
+	font-family: 'Syncopate', sans-serif;
+	font-size: 30px;
 }
 
 .siteNameControl{
